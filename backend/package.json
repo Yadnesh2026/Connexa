@@ -1,0 +1,29 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+
+  "author": "yadnesh",
+  "license": "ISC",
+
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.6.2",
+    "multer": "^2.1.1",
+    "pdf-creator-node": "^4.0.1",
+    "pdfkit": "^0.18.0"
+  },
+
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
