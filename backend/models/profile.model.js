@@ -31,7 +31,7 @@ const workSchema = new mongoose.Schema({
     }
 })
 
-const ProfileSchema = new mongoose({
+const ProfileSchema = new mongoose.Schema({
     userId:{
         type:mongoose.Schema.Types.ObjectId,
         ref:'User'
@@ -53,6 +53,10 @@ const ProfileSchema = new mongoose({
         default:[]
     }
 })
+
+const Profile = mongoose.model("Profile",ProfileSchema)
+
+export default Profile;
 
 
 

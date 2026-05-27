@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import postRoutes from "./routes/post.route.js"
-// import userRoutes from "./routes/user.route.js"
+import userRoutes from "./routes/user.route.js"
 
 dotenv.config();
 
@@ -14,6 +14,7 @@ app.use(express.json()); //for json format
 
 //Use Routes
 app.use(postRoutes)
+app.use(userRoutes)
 
 const start = async () => {
   try {
