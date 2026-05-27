@@ -32,9 +32,15 @@ export const register = async (req, res) => {
     await newUser.save();
 
     const profile = new Profile({userId : newUser._id})
+
+    await profile.save();
     return res.json({message:"User Created"})
 
   } catch (err) {
-    return res.status(500).json({ message: "Register Issue" });
+    console.log(err);
+
+    return res.status(500).json({
+        message:"Registered Issue"
+    })
   }
 };

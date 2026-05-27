@@ -3,7 +3,7 @@ import { activeCheck } from "../controllers/post.controller.js";
 
 const router = Router();
 
-router.route('/').get(activeCheck);
+router.route('/').post(activeCheck);
 
 
 export default router;

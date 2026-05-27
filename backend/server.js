@@ -10,7 +10,7 @@ dotenv.config();
 const app = express();
 
 app.use(cors()); //for frontend backend interaction
-app.use(express.json()); //for json format
+app.use(express.json()); //for json format - keep always above the routes 
 
 //Use Routes
 app.use(postRoutes)
