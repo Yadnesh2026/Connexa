@@ -1,6 +1,8 @@
 import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
+import crypto from "crypto";
+
 
 
 export const register = async (req, res) => {
@@ -50,7 +52,7 @@ export const login = async(req,res)=>{
         //type all inpu fields
         const {email,password}= req.body
 
-        if(!email, !password){
+        if(!email || !password){
             return res.status(400).json({message:"All fields are required"})
         }
 
@@ -64,9 +66,9 @@ export const login = async(req,res)=>{
         }
 
         //Check password bcrpyt
-        const isMatch = await bcrypt.comapare(password, user.password)
+        const isMatch = await bcrypt.compare(password, user.password)
         if(!isMatch){
-            return register.status(400).json({message:"Invalid Credentials"})
+            return res.status(400).json({message:"Invalid Credentials"})
         }
         //Understand this part of token later
         const token =crypto.randomBytes(32).toString("hex")
