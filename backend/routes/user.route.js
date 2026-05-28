@@ -23,6 +23,20 @@ const upload = multer({ storage: storage });
 router.route("/upload_profile") //Path to where file is gonna store
   .post(upload.single("profile"), uploadProfilePicture);//Take one uploaded file whose field name is profile
 
+//After this Multer above step then file became (req.file) - stores here 
+
+// Frontend File
+//       ↓
+// upload.single("profile")
+//       ↓
+// Multer stores image
+//       ↓
+// req.file created
+//       ↓
+// uploadProfilePicture controller
+
+
+
 router.route("/register").post(register);
 router.route("/login").post(login);
 
