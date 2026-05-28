@@ -3,6 +3,8 @@ import {
   login,
   register,
   uploadProfilePicture,
+  updateUserProfile,
+  get_user_and_profile
 } from "../controllers/user.controller.js";
 import multer from "multer"; //Used to file upload from frontend to backend
 
@@ -39,5 +41,7 @@ router.route("/upload_profile") //Path to where file is gonna store
 
 router.route("/register").post(register);
 router.route("/login").post(login);
+router.route("/user_update").post(updateUserProfile)
+router.route("/get_user_and_profile").get(get_user_and_profile)
 
 export default router;

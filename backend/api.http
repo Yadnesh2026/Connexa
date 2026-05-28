@@ -17,5 +17,13 @@ Content-Type: application/json
   "password": "123456"
 }
 
+###
+GET http://localhost:9090/get_user_and_profile
+Content-Type: application/json
+
+{
+  "token":"5c43cd8be9b4d5ca5a1ac8275341aa6b522f159909d65f1d1fb636491c5d8589"
+}
+
 
 

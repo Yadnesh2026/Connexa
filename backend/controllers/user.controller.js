@@ -3,6 +3,7 @@ import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
+//Register User
 export const register = async (req, res) => {
   try {
     //if user not exist
@@ -44,6 +45,7 @@ export const register = async (req, res) => {
   }
 };
 
+//Login Route
 export const login = async (req, res) => {
   try {
     //type all inpu fields
@@ -82,6 +84,7 @@ export const login = async (req, res) => {
   }
 };
 
+//Uploading the proile picture
 export const uploadProfilePicture = async (req, res) => {
   const { token } = req.body;
 
@@ -95,8 +98,59 @@ export const uploadProfilePicture = async (req, res) => {
     user.profile = req.file.filename;
     await user.save();
 
-    return res.status(200).json({message:"Profile Picture Updated"})
+    return res.status(200).json({ message: "Profile Picture Updated" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
+
+//Update user profile for email adn username
+export const updateUserProfile = async (req, res) => {
+  try {
+    const { token, ...newUser } = req.body;
+
+    const user = await User.findOne({ token: token });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { username, email } = newUser;
+    const exisingUser = await User.findOne({ $or: [{ username }, { email }] });
+
+    if (exisingUser) {
+      if (exisingUser || String(exisingUser._id) !== String(user, _id)) {//if the same curr user is same user which is exsiting user then only it can change
+        return res.status(400).json({ message: "User Already exist" });
+      }
+    }
+    //Learn  this object propertys from object mdn 
+    Object.assign(user,newUser);
+    await user.save()
+
+    return res.status(200).json({message:"User updated"})
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+//update bio and all data
+export const get_user_and_profile =async(req,res)=>{
+  const {token} =req.body
+  try{
+    const user =User.findOne({token:token})
+
+    if(!user){
+      return res.status(400).json({message:"user not found"})
+    }
+
+    const userProfile = await Profile.findOne({userId: user._id})
+    .populate('userId','name email username profile')
+
+    return res.json(userProfile)
+
+  }catch(err){
+    return res.status(500).json({message:err.message})
+  }
+
+}
