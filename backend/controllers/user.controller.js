@@ -3,8 +3,6 @@ import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-
-
 export const register = async (req, res) => {
   try {
     //if user not exist
@@ -33,57 +31,72 @@ export const register = async (req, res) => {
     });
     await newUser.save();
 
-    const profile = new Profile({userId : newUser._id})
+    const profile = new Profile({ userId: newUser._id });
 
     await profile.save();
-    return res.json({message:"User Created"})
-
+    return res.json({ message: "User Created" });
   } catch (err) {
     console.log(err);
 
     return res.status(500).json({
-        message:"Registered Issue"
-    })
+      message: "Registered Issue",
+    });
   }
 };
 
-export const login = async(req,res)=>{
-    try{
-        //type all inpu fields
-        const {email,password}= req.body
+export const login = async (req, res) => {
+  try {
+    //type all inpu fields
+    const { email, password } = req.body;
 
-        if(!email || !password){
-            return res.status(400).json({message:"All fields are required"})
-        }
+    if (!email || !password) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
 
-        //check if user has registred
-        const user = await User.findOne({
-            email
-        });
+    //check if user has registred
+    const user = await User.findOne({
+      email,
+    });
 
-        if(!user){
-            return res.status(404).json({message:"User Does not exist"})
-        }
+    if (!user) {
+      return res.status(404).json({ message: "User Does not exist" });
+    }
 
-        //Check password bcrpyt
-        const isMatch = await bcrypt.compare(password, user.password)
-        if(!isMatch){
-            return res.status(400).json({message:"Invalid Credentials"})
-        }
-        //Understand this part of token later
-        const token =crypto.randomBytes(32).toString("hex")
+    //Check password bcrpyt
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
+    //Understand this part of token later
+    const token = crypto.randomBytes(32).toString("hex");
 
-        await User.updateOne({_id:user._id},{token});
+    await User.updateOne({ _id: user._id }, { token });
 
-        return res.json({token})
-
-
-
-    }catch (err) {
+    return res.json({ token });
+  } catch (err) {
     console.log(err);
 
     return res.status(500).json({
-        message:"Registered Issue"
-    })
+      message: "Registered Issue",
+    });
   }
-}
+};
+
+export const uploadProfilePicture = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const user = await User.findOne({ token: token });
+
+    if (!user) {
+      return res.status(400).json({ message: "user not Found" });
+    }
+
+    user.profile = req.file.filename;
+    await user.save();
+
+    return res.status(200).json({message:"Profile Picture Updated"})
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
