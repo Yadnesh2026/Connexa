@@ -4,7 +4,9 @@ import {
   register,
   uploadProfilePicture,
   updateUserProfile,
-  get_user_and_profile
+  get_user_and_profile,
+  updateProfileData,
+  getAllUserProfile
 } from "../controllers/user.controller.js";
 import multer from "multer"; //Used to file upload from frontend to backend
 
@@ -43,5 +45,9 @@ router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/user_update").post(updateUserProfile)
 router.route("/get_user_and_profile").post(get_user_and_profile)
+router.route("/user/updateProfileData").post(updateProfileData)
+router.route("/user/getAllUserProfile").get(getAllUserProfile)
+
+
 
 export default router;

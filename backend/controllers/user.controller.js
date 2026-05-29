@@ -3,6 +3,14 @@ import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
+import PDFDocument from 'pdfkit'
+
+const convertUserDataToPDF =(userData)=>{
+  const doc = new PDFDocument();
+
+  const ouputPath = crypto
+}
+
 //Register User
 export const register = async (req, res) => {
   try {
@@ -154,6 +162,58 @@ export const get_user_and_profile = async (req, res) => {
   }
 };
 
-export const updateProfileData =async(req,res)=>{
-  
+//update the profile picture
+export const updateProfileData = async (req, res) => {
+  try {
+    const { token, ...newUser } = req.body;
+
+    const userProfile = await User.findOne({ token: token });
+
+    if (!userProfile) {
+      res.status(404).json({ message: "User not found" });
+    }
+
+    const profile_to_update = await Profile.findOne({
+      userId: userProfile._id,
+    });
+    Object.assign(profile_to_update, newProfileData); //Object assign operator
+
+    await profile_to_update.save();
+    res.status(200).json({ message: "Profile Updated" });
+
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+};
+
+//Get all User profile - Serach bar
+export const getAllUserProfile =async(req,res)=>{
+  try{
+    const profiles = await Profile.find().populate('userId','name username email profilePicture');
+
+    return res.json({profiles})
+
+  }catch(err){
+    return res.status(500).json({message:err.message})
+  }
+}
+
+//Download the resume 
+export const downloadProfile = async (req,res)=>{
+  const user_id = req.query.id;
+
+  const userProfile = await Profile.findOne({userId: user_id})
+  .populate('userId','name username email profilePicture')
+
+  let a = await convertUserDataToPDF(userProfile);
+
+  return res.json({"message":a})
+
+  try{
+
+  }catch(err){
+    return res.status(500).json({message:err.message})
+  }
+
 }
