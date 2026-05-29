@@ -153,3 +153,7 @@ export const get_user_and_profile = async (req, res) => {
     return res.status(500).json({ message: err.message });
   }
 };
+
+export const updateProfileData =async(req,res)=>{
+  
+}
