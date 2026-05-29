@@ -2,7 +2,7 @@ POST http://localhost:9090/register
 Content-Type: application/json
 
 {
-  "name": "Vedant",
+  "name": "Vedan",
   "email": "vedant@gmail.com",
   "password": "123456",
   "username": "vedant"
@@ -22,7 +22,7 @@ GET http://localhost:9090/get_user_and_profile
 Content-Type: application/json
 
 {
-  "token":"5c43cd8be9b4d5ca5a1ac8275341aa6b522f159909d65f1d1fb636491c5d8589"
+  "token":"5fd725ce59ff9d4b31732d43e4294bf3178c693fe4542848be993f6f335c29f6"
 }
 
 

@@ -42,6 +42,6 @@ router.route("/upload_profile") //Path to where file is gonna store
 router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/user_update").post(updateUserProfile)
-router.route("/get_user_and_profile").get(get_user_and_profile)
+router.route("/get_user_and_profile").post(get_user_and_profile)
 
 export default router;
