@@ -100,8 +100,6 @@ backend/
 * Cloud Image Storage
 * Role-Based Authorization
 
-## Author
 
-**Yadnesh Vidulkar (Vedant)**
 
 Built as a learning project to explore full-stack web development using Node.js, Express.js, MongoDB, and modern backend architecture.
