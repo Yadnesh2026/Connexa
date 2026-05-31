@@ -200,6 +200,7 @@ export const getAllUserProfile =async(req,res)=>{
   }
 }
 
+
 //Download the resume 
 export const downloadProfile = async (req,res)=>{
   const user_id = req.query.id;
