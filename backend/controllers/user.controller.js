@@ -142,9 +142,6 @@ export const updateUserProfile = async (req, res) => {
   }
 };
 
-
-
-
 //update bio and all data
 export const get_user_and_profile = async (req, res) => {
   const { token } = req.body;
