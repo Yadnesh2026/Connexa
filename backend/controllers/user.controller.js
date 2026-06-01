@@ -15,8 +15,8 @@ const convertUserDataToPDF =(userData)=>{
 
   doc.pipe(stream);
 
-  doc.addPage
-
+  doc.image('/uploads/${userData.userId.profilePicture}',{align:"center",width:100})
+  doc.fontSize(14).text()
 }
 
 //Register User
