@@ -4,12 +4,19 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 
 import PDFDocument from 'pdfkit'
+import fs from "fs"
 
 const convertUserDataToPDF =(userData)=>{
   const doc = new PDFDocument();
 
 ///Start from hereeeeeeee
-  const ouputPath = crypto
+  const outputPath = crypto.randomBytes(32).toString("hex")+".pdf";
+  const stream = fs.createdWriteStream("/uploads",outputPath);
+
+  doc.pipe(stream);
+
+  doc.addPage
+
 }
 
 //Register User
