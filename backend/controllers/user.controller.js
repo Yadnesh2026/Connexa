@@ -3,21 +3,55 @@ import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-import PDFDocument from 'pdfkit'
-import fs from "fs"
+import PDFDocument from "pdfkit";
+import fs from "fs";
 
-const convertUserDataToPDF =(userData)=>{
+const convertUserDataToPDF = (userData) => {
   const doc = new PDFDocument();
 
-///Start from hereeeeeeee
-  const outputPath = crypto.randomBytes(32).toString("hex")+".pdf";
-  const stream = fs.createdWriteStream("/uploads",outputPath);
+  // Generate PDF filename
+  const outputPath = `uploads/${crypto.randomBytes(16).toString("hex")}.pdf`;
+
+  const stream = fs.createWriteStream(outputPath);
 
   doc.pipe(stream);
 
-  doc.image('/uploads/${userData.userId.profilePicture}',{align:"center",width:100})
-  doc.fontSize(14).text()
-}
+  // Profile Picture
+  if (userData.userId.profilePicture) {
+    doc.image(
+      `uploads/${userData.userId.profilePicture}`,
+      {
+        align: "center",
+        width: 100,
+      }
+    );
+  }
+
+  doc.moveDown();
+
+  // User Information
+  doc.fontSize(14).text(`Name: ${userData.userId.name}`);
+  doc.fontSize(14).text(`Email: ${userData.userId.email}`);
+  doc.fontSize(14).text(`Username: ${userData.userId.username}`);
+  doc.fontSize(14).text(`Bio: ${userData.bio}`);
+  doc.fontSize(14).text(`Current Position: ${userData.currentPosition}`);
+
+  doc.moveDown();
+
+  // Past Work
+  doc.fontSize(16).text("Past Work:");
+
+  userData.pastWork.forEach((work, index) => {
+    doc.moveDown(0.5);
+    doc.fontSize(14).text(`Company Name: ${work.companyName}`);
+    doc.fontSize(14).text(`Position: ${work.position}`);
+    doc.fontSize(14).text(`Year: ${work.years}`);
+  });
+
+  doc.end();
+
+  return outputPath;
+};
 
 //Register User
 export const register = async (req, res) => {
@@ -111,7 +145,7 @@ export const uploadProfilePicture = async (req, res) => {
       return res.status(400).json({ message: "user not Found" });
     }
 
-    user.profile = req.file.filename;
+    user.profilePicture = req.file.filename;
     await user.save();
 
     return res.status(200).json({ message: "Profile Picture Updated" });
@@ -178,67 +212,54 @@ export const updateProfileData = async (req, res) => {
     const userProfile = await User.findOne({ token: token });
 
     if (!userProfile) {
-      res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     const profile_to_update = await Profile.findOne({
       userId: userProfile._id,
     });
-    Object.assign(profile_to_update, newProfileData); //Object assign operator
+    Object.assign(profile_to_update, newUser); //Object assign operator
 
     await profile_to_update.save();
     res.status(200).json({ message: "Profile Updated" });
-
-
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
 //Get all User profile - Serach bar
-export const getAllUserProfile =async(req,res)=>{
-  try{
-    const profiles = await Profile.find().populate('userId','name username email profilePicture');
+export const getAllUserProfile = async (req, res) => {
+  try {
+    const profiles = await Profile.find().populate(
+      "userId",
+      "name username email profilePicture",
+    );
 
-    return res.json({profiles})
-
-  }catch(err){
-    return res.status(500).json({message:err.message})
+    return res.json({ profiles });
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
   }
-}
+};
 
+//Download the resume
+export const downloadProfile = async (req, res) => {
+  try {
+    const user_id = req.query.id;
 
-//Download the resume 
-export const downloadProfile = async (req,res)=>{
-  const user_id = req.query.id;
+    const userProfile = await Profile.findOne({
+      userId: user_id,
+    }).populate(
+      "userId",
+      "name username email profilePicture"
+    );
 
-  const userProfile = await Profile.findOne({userId: user_id})
-  .populate('userId','name username email profilePicture')
+    const pdfPath = convertUserDataToPDF(userProfile);
 
-  let a = await convertUserDataToPDF(userProfile);
+    return res.json({ pdfPath });
 
-  return res.json({"message":a})
-
-  try{
-
-  }catch(err){
-    return res.status(500).json({message:err.message})
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
   }
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+};
