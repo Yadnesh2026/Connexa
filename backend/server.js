@@ -10,11 +10,12 @@ dotenv.config();
 const app = express();
 
 app.use(cors()); //for frontend backend interaction
-app.use(express.json()); //for json format - keep always above the routes 
+app.use(express.json()); //for json format - keep always above the routes
 
 //Use Routes
 app.use(postRoutes)
 app.use(userRoutes)
+app.use(express.static("uploads")) //Absolute path for profile Picture
 
 const start = async () => {
   try {

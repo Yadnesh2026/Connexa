@@ -6,7 +6,8 @@ import {
   updateUserProfile,
   get_user_and_profile,
   updateProfileData,
-  getAllUserProfile
+  getAllUserProfile,
+  downloadProfile
 } from "../controllers/user.controller.js";
 import multer from "multer"; //Used to file upload from frontend to backend
 
@@ -47,6 +48,7 @@ router.route("/user_update").post(updateUserProfile)
 router.route("/get_user_and_profile").post(get_user_and_profile)
 router.route("/user/updateProfileData").post(updateProfileData)
 router.route("/user/getAllUserProfile").get(getAllUserProfile)
+router.route("/user/download_resume").get(downloadProfile)
 
 
 

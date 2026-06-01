@@ -253,9 +253,9 @@ export const downloadProfile = async (req, res) => {
       "name username email profilePicture"
     );
 
-    const pdfPath = convertUserDataToPDF(userProfile);
+    const outputPath = convertUserDataToPDF(userProfile);
 
-    return res.json({ pdfPath });
+    return res.json({ outputPath });
 
   } catch (err) {
     return res.status(500).json({
