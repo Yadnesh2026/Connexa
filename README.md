@@ -1,4 +1,4 @@
-# Connexa
+# Connexa - An Social Media Application
 
 A Node.js and Express.js backend for Connexa, a professional networking platform inspired by LinkedIn.
 
