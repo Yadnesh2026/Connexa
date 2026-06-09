@@ -22,4 +22,7 @@ router.route("/post").post(upload.single('media'), createPost)
 
 
 
+
+
+
 export default router;
