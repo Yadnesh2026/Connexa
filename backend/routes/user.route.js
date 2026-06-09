@@ -49,6 +49,7 @@ router.route("/get_user_and_profile").post(get_user_and_profile)
 router.route("/user/updateProfileData").post(updateProfileData)
 router.route("/user/getAllUserProfile").get(getAllUserProfile)
 router.route("/user/download_resume").get(downloadProfile)
+router.route("/user/send_connecction_request")
 
 
 
