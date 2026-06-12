@@ -44,3 +44,26 @@ export const getAllPost = async (req,res)=>{
     });
   }
 }
+
+const deletePost = async(req,res)=>{
+  const {token,postId} =req.body;
+
+  try{
+    const user = await User.findOne({token: token}).select("_id");
+
+  if(!user){
+    return res.status(404).json({message:"User not found"})
+  }  
+
+  const post = await Post.findOne({_id: post_id});
+
+  if(!post){
+    return req.status(401).json({message:"Unauthorozised"})
+  }
+
+  }catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}
