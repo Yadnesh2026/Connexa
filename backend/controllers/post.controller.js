@@ -32,3 +32,15 @@ export const createPost = async (req, res) => {
     req.status(500).json({ message: err.message });
   }
 };
+
+export const getAllPost = async (req,res)=>{
+  try{
+    const posts =await Post.find().populate('userId','name username email profilePicture')
+    return res.json({posts})
+
+  }catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+}
