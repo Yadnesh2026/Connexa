@@ -45,7 +45,8 @@ export const getAllPost = async (req,res)=>{
   }
 }
 
-const deletePost = async(req,res)=>{
+//Delete Post Route
+export const deletePost = async(req,res)=>{
   const {token,postId} =req.body;
 
   try{
