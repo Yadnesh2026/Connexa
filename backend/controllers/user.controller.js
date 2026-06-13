@@ -3,11 +3,12 @@ import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-import PDFDocument, { find } from "pdfkit";
+import PDFDocument from "pdfkit";
 import fs from "fs";
-import { connection, Connection } from "mongoose";
+// import { connection, Connection } from "mongoose";
 import ConnectionRequest from "../models/connections.model.js";
 import Post from "../models/post.model.js";
+import Comment from "../models/comments.model.js";
 
 const convertUserDataToPDF = (userData) => {
   const doc = new PDFDocument();
@@ -195,7 +196,7 @@ export const get_user_and_profile = async (req, res) => {
 
     const userProfile = await Profile.findOne({ userId: user._id }).populate(
       "userId",
-      "name email username profile",
+      "name email username profilePicture",
     );
 
     return res.json(userProfile);
@@ -312,7 +313,7 @@ export const getMyConnectionRequest = async (req, res) => {
 
     //request already send if they have sendd already request
     const connections = await ConnectionRequest.find({ userId: user._id })
-      .populatr;
+      .populate;
   } catch (err) {
     return res.status(500).json({
       message: err.message,
