@@ -7,6 +7,7 @@ import PDFDocument, { find } from "pdfkit";
 import fs from "fs";
 import { connection, Connection } from "mongoose";
 import ConnectionRequest from "../models/connections.model.js";
+import Post from "../models/post.model.js";
 
 const convertUserDataToPDF = (userData) => {
   const doc = new PDFDocument();
@@ -311,7 +312,41 @@ export const getMyConnectionRequest = async (req, res) => {
 
     //request already send if they have sendd already request
     const connections = await ConnectionRequest.find({ userId: user._id })
-    .populatr
+      .populatr;
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+export const commentPost = async (req, res) => {
+  const { token, post_id, commentBody } = req.body;
+  const user = await User.findOne({ token: token });
+
+  try {
+    const user = await User.findOne({ token: token }).select("_id");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const post = await Post.findOne({
+      _id: post_id,
+    });
+
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+    }
+    const comment = new Comment({
+      userId: user._id,
+      postId: post_id,
+      comment: commentBody,
+    });
+
+    await comment.save();
+
+    return res.status(200).json({ message: "Comment Added" });
   } catch (err) {
     return res.status(500).json({
       message: err.message,
