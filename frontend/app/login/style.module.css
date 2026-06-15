@@ -68,3 +68,14 @@
     border-radius: 10px;
     cursor: pointer;
 }
+.cardContainerRight{
+    flex:0.4;
+    background: #00488b;
+    display: flex;
+    justify-content: center;
+    color: white;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding-inline: 1.2rem;
+}

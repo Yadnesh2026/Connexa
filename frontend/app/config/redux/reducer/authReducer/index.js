@@ -24,6 +24,9 @@ const authSlice = createSlice({
     handleLoginUser: (state) => {
       state.message = "hello";
     },
+    emptyMessage:(state)=>{
+      state.message =""
+    }
   },
 
   extraReducers: (builder) => {
@@ -42,7 +45,9 @@ const authSlice = createSlice({
         state.isSuccess = true;
         state.loggedIn = true;
         state.user = action.payload;
-        state.message = "Login is successful";
+        state.message ={
+          message :"Registration is Successfull, Please Login "
+        };
       })
 
       // LOGIN FAILED
@@ -55,5 +60,7 @@ const authSlice = createSlice({
       });
   },
 });
+
+export const { reset, emptyMessage } = authSlice.actions;
 
 export default authSlice.reducer;
