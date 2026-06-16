@@ -3,11 +3,13 @@
 import React from "react";
 import styles from "./styles.module.css";
 import { useRouter } from "next/navigation";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { reset } from "@/app/config/redux/reducer/authReducer";
 
 function NavBarComponent() {
   const router = useRouter();
   const authState = useSelector((state) => state.auth);
+  const dispatch =useDispatch()
   console.log(authState);
   return (
     <div className={styles.container}>
@@ -17,25 +19,68 @@ function NavBarComponent() {
         </h1>
 
         <div className={styles.navBarOptionContainer}>
+          
           {authState.ProfileFetched && (
-            <div>
-              <div style={{ display: "flex", gap: "1.2rem" }}>
+            <div className={styles.signedInControls}>
                 
                 {authState.user?.userId && (
                   <p>Hey, {authState.user.userId.name}</p>
                 )}
 
-                <p style={{ fontWeight: "bold", cursor: "pointer" }}>
-                  Profile{" "}
-                </p>
-              </div>
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  aria-label="Profile"
+                  title="Profile"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.8}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.5 20.25a7.5 7.5 0 0 1 15 0"
+                    />
+                  </svg>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  aria-label="Log out"
+                  title="Log out"
+                  onClick={() => {
+                    localStorage.removeItem("token");
+                    router.push("/login");
+                    dispatch(reset());
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.8}
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3-3h-9m9 0-3-3m3 3-3 3"
+                    />
+                  </svg>
+                </button>
             </div>
           )}
 
           {!authState.ProfileFetched && (
             <div
               onClick={() => {
-                router.push("/login");
+                router.push("/login")
+                dispatch(reset())
               }}
               className={styles.buttonJoin}
             >

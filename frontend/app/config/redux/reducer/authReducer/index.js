@@ -13,7 +13,7 @@ const initialState = {
   connections: [],
   connectionRequest: [],
   all_users:[],
-  all_profiles_fetching:false
+  all_profiles_fetched:false
 };
 
 const authSlice = createSlice({
@@ -78,7 +78,7 @@ const authSlice = createSlice({
       .addCase(getAllUsers.fulfilled,(state,action)=>{
         state.isLoading=false;
         state.isError = false;
-        state.all_profiles_fetching =true;
+        state.all_profiles_fetched =true;
         state.all_users =action.payload.profiles
       })
   },

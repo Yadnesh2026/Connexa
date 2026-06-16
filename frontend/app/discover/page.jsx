@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useEffect } from "react";
 import UserLayout from "../layout/UserLayout/page";
 import DashBoardLayout from "../layout/DashBoardLayout/Page";

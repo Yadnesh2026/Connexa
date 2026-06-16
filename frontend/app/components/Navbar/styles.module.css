@@ -10,6 +10,35 @@
 }
 .navBarOptionContainer{
     display: flex;
+    align-items: center;
+}
+
+.signedInControls{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+}
+
+.iconButton{
+    width: 2.4rem;
+    height: 2.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d7d7d7;
+    border-radius: 8px;
+    background: white;
+    color: #222;
+    cursor: pointer;
+}
+
+.iconButton svg{
+    width: 1.2rem;
+    height: 1.2rem;
+}
+
+.iconButton:hover{
+    background: #f6f6f6;
 }
 
 .buttonJoin{

@@ -4,9 +4,10 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAboutUser } from "../config/redux/action/authAction";
-import UserLayout from "../layout/UserLayout/page";
+import UserLayout from "../layout/UserLayout/page.jsx";
 import { getAllPosts } from "../config/redux/action/postAction";
-import DashBoardLayout from "../layout/DashBoardLayout/Page";
+import DashBoardLayout from "../layout/DashBoardLayout/Page.jsx";
+import { getAllUsers } from "../config/redux/action/authAction";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -18,7 +19,7 @@ export default function Dashboard() {
 
   useEffect(() => {
 
-    if (authState.isTokenthere) {
+    if (authState.isTokenThere) {
      console.log("Calling getAboutUser");
       dispatch(getAllPosts());
       dispatch(getAboutUser({ token: localStorage.getItem("token") }));
@@ -29,7 +30,7 @@ export default function Dashboard() {
         }
 
 
-  }, [authState.isTokenthere]);
+  }, [authState.isTokenThere]);
 
 
   return (

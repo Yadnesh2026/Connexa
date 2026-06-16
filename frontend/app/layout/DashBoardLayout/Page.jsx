@@ -1,10 +1,11 @@
 "use client";
 
-import React, { Profiler, useEffect } from "react";
+import React, {useEffect } from "react";
 import styles from "./styles.module.css";
 import { useRouter } from "next/navigation";
-import setTokenisThere from "../../config/redux/reducer/authReducer"
-import { useDispatch } from "react-redux";
+import { setTokenisThere } from "../../config/redux/reducer/authReducer";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllUsers } from "../../config/redux/action/authAction";
 
 
 
@@ -12,15 +13,24 @@ import { useDispatch } from "react-redux";
 export default function DashBoardLayout({ children }) {
   const router = useRouter();
   const dispatch =useDispatch();
+  const authState = useSelector((state) => state.auth);
 
 
   useEffect(() => {
+
+    console.log("DashboardLayout mounted");
+
     if (localStorage.getItem("token") === null) {
       router.push("/login");
     }
     dispatch(setTokenisThere());
 
-  }, []);
+    if (!authState.all_profiles_fetched) {
+      dispatch(getAllUsers());
+    }
+
+    console.log("dispatch fired");
+  }, [authState.all_profiles_fetched, dispatch, router]);
 
   return (
     <div>
@@ -104,10 +114,12 @@ export default function DashBoardLayout({ children }) {
 
             <h3>Top Profiles</h3>
             {authState.all_profiles_fetched && authState.all_users.map((Profile)=>{
+                const user = Profile.userId;
+                const profilePicture = user?.profilePicture || "default.jpg";
                 return(
                     <div key={Profile._id} className={styles.extraContainer__profile}>
-                        <img src={Profile.profile_pic} alt=""/>
-                        <p>{profile.name}</p>
+                        <img src={`http://localhost:9090/${profilePicture}`} alt={user?.name || "Profile"}/>
+                        <p>{user?.name}</p>
 
                     </div>
                 )

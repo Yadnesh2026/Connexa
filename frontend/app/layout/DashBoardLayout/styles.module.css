@@ -36,3 +36,18 @@ transform: scale(1.04);
 .sideBarOption > svg{
     height: 1.4em;
 }
+
+.extraContainer__profile{
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.extraContainer__profile img{
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #f0f0f0;
+}
