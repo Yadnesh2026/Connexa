@@ -8,6 +8,8 @@ import UserLayout from "../layout/UserLayout/page.jsx";
 import { getAllPosts } from "../config/redux/action/postAction";
 import DashBoardLayout from "../layout/DashBoardLayout/Page.jsx";
 import { getAllUsers } from "../config/redux/action/authAction";
+import styles from "./styles.module.css" 
+import { baseURL } from "../config/index.jsx";
 
 export default function Dashboard() {
   const router = useRouter();
@@ -38,8 +40,10 @@ export default function Dashboard() {
       {/* {authState.profileFetched && <div>Hey {authState.user.userId.name}</div>} */}
 
       <DashBoardLayout>
-        <div>
-          <h1>Dashbboard</h1>
+        <div className="scrollComponent">
+          <div className={styles.createPostContainer}>
+          <img width={100} src={`${baseURL}/${authState.user?.userId?.profilePicture}`}/>
+          </div>
         </div>
       </DashBoardLayout>
       

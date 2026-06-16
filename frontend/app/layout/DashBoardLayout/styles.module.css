@@ -35,6 +35,7 @@ transform: scale(1.04);
 
 .sideBarOption > svg{
     height: 1.4em;
+    min-width: fit-content;
 }
 
 .extraContainer__profile{
