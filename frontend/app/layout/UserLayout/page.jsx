@@ -1,5 +1,5 @@
 import React from "react";
-import NavBarComponent from "../../components/Navbar";
+import NavBarComponent from "../../components/Navbar/page";
 
 function UserLayout({ children }) {
   return (

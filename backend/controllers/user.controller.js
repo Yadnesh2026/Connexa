@@ -355,4 +355,68 @@ export const commentPost = async (req, res) => {
   }
 };
 
+export const whatAreMyConnections = async (req, res) => {
+  const { token } = req.body;
+
+  try {
+    const user = await User.findOne({ token });
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const connections = await ConnectionRequest.find({
+      $or: [
+        {
+          userId: user._id,
+          status_accepted: true,
+        },
+        {
+          connectionId: user._id,
+          status_accepted: true,
+        },
+      ],
+    }).populate(
+      "userId connectionId",
+      "name username email profilePicture"
+    );
+
+    return res.json({ connections });
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
+export const acceptConnectionRequest = async (req, res) => {
+  const { requestId } = req.body;
+
+  try {
+    const request = await ConnectionRequest.findById(requestId);
+
+    if (!request) {
+      return res.status(404).json({
+        message: "Request not found",
+      });
+    }
+
+    request.status_accepted = true;
+
+    await request.save();
+
+    return res.status(200).json({
+      message: "Connection Request Accepted",
+    });
+
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};
+
 

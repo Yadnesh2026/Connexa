@@ -2,7 +2,7 @@
 
 // import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import UserLayout from "../layout/UserLayout";
+import UserLayout from "../layout/UserLayout/page";
 import { useRouter } from "next/navigation";
 import styles from "./style.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -39,6 +39,8 @@ export default function Login() {
   },[userLogin])
 
    const handleRegister = () => {
+  console.log("Register button clicked");
+
   dispatch(
     registerUser({
       username,

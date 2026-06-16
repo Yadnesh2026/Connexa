@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import React from "react";
 import styles from "./Home.module.css";
-import UserLayout from "./layout/UserLayout"
+import UserLayout from "./layout/UserLayout/page"
 
 export default function Home() {
   const router = useRouter();
