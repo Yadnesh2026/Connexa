@@ -14,7 +14,7 @@ export const createPost = async (req, res) => {
   try {
     const user = await User.findOne({ token: token });
 
-    if (!User) {
+    if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
@@ -22,120 +22,114 @@ export const createPost = async (req, res) => {
       userId: user._id,
       body: req.body.body,
       media: req.file != undefined ? req.file.filename : "",
-      fileType: req.file != undefined ? req.file.mimetype.split("/") : "",
+      fileType: req.file != undefined ? req.file.mimetype : "",
     });
 
     await post.save();
 
-    return res.json({ message: "Post Creaed" });
+    return res.json({ message: "Post Created" });
   } catch (err) {
-    req.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 };
 
-export const getAllPost = async (req,res)=>{
-  try{
-    const posts =await Post.find().populate('userId','name username email profilePicture')
-    return res.json({posts})
-
-  }catch (err) {
+export const getAllPost = async (req, res) => {
+  try {
+    const posts = await Post.find().populate(
+      "userId",
+      "name username email profilePicture",
+    );
+    return res.json({ posts });
+  } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-}
+};
 
 //Delete Post Route
-export const deletePost = async(req,res)=>{
-  const {token,postId} =req.body;
+export const deletePost = async (req, res) => {
+  const { token, post_id } = req.body;
 
-  try{
-    const user = await User.findOne({token: token}).select("_id");
+  try {
+    const user = await User.findOne({ token: token }).select("_id");
 
-  if(!user){
-    return res.status(404).json({message:"User not found"})
-  }  
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-  const post = await Post.findOne({_id: post_id});
+    const post = await Post.findOne({ _id: post_id });
 
-  if(!post){
-    return req.status(401).json({message:"Unauthorozised"})
-  }
+    if (!post || String(post.userId) !== String(user._id)) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
 
-  }catch (err) {
+    await Post.deleteOne({ _id: post_id });
+    return res.json({ message: "Post deleted" });
+  } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-}
+};
 
+export const get_comment_by_post = async (req, res) => {
+  const { post_id } = req.body;
 
+  try {
+    const post = await Post.findOne({ _id: post_id });
 
-
-export const get_comment_by_post =async(req,res)=>{
-  const {post_id} = req.body;
-
-  try{
-    const post = await Post.findOne({_id:post_id});
-
-    if(!post){
-      return res.status(404).json({message:"Post not Found"})
+    if (!post) {
+      return res.status(404).json({ message: "Post not Found" });
     }
 
-    return res.json({comments:post.comments})
-
-  }catch (err) {
+    return res.json({ comments: post.comments });
+  } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-}
+};
 
-export const delete_comment_of_user = async(req,res)=>{
-  const {token, comment_id} = req.body;
+export const delete_comment_of_user = async (req, res) => {
+  const { token, comment_id } = req.body;
 
-  try{
-    const user =await findOne({token:token}).select("_id");
+  try {
+    const user = await findOne({ token: token }).select("_id");
 
-    if(!user){
-      return res.status(404).json({message: "User not found"})
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
     }
-    const comment = await Comment.findOne({"_id":comment_id})
+    const comment = await Comment.findOne({ _id: comment_id });
 
-    if(!comment){
-      res.status(404).json({message:"Unauthorized"})
+    if (!comment) {
+      res.status(404).json({ message: "Unauthorized" });
     }
 
-    await Comment.deleteOne({"_id":comment_id});
-    return res.json({message: "Comment Deleted"})
-
-  }catch (err) {
+    await Comment.deleteOne({ _id: comment_id });
+    return res.json({ message: "Comment Deleted" });
+  } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-}
+};
 
+export const increment_likes = async (req, res) => {
+  const { post_id } = req.body;
 
+  try {
+    const post = await Post.findOne({ _id: post_id });
 
-export const increment_likes =async(req,res)=>{
-  const {post_id} =req.body;
-
-  try{
-    const post =await Post.findOne({_id: post_id})
-
-    if(!post){
-      return res.status(404).json({message: "Post not found"})
+    if (!post) {
+      return res.status(404).json({ message: "Post not found" });
     }
 
-    post.likes = post.likes+1;
-    await post.save()
-
-  }catch (err) {
+    post.likes = post.likes + 1;
+    await post.save();
+  } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-}
-
-
+};
