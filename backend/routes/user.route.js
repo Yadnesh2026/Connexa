@@ -11,7 +11,8 @@ import {
   sendConnecionRequest,
   getMyConnectionRequest,
   whatAreMyConnections,
-  acceptConnectionRequest
+  acceptConnectionRequest,
+  getUserProfileAndUserBasedOnUsername
 } from "../controllers/user.controller.js";
 import multer from "multer"; //Used to file upload from frontend to backend
 
@@ -53,12 +54,15 @@ router.route("/get_user_and_profile").post(get_user_and_profile)
 router.route("/update_profile_data").post(updateProfileData);
 
 router.route("/user/getAllUserProfile").get(getAllUserProfile)
+
 router.route("/user/download_resume").get(downloadProfile)
 router.route("/user/send_connecction_request").get(sendConnecionRequest)
 router.route("/user/getConnectionRequests").get(getMyConnectionRequest);
 
 router.route("/user/user_connection_request").post(whatAreMyConnections)
 router.route("/user/accept_connection_request").post(acceptConnectionRequest)
+router.route("/user/getUserProfileAndUserBasedOnUsername").get(getUserProfileAndUserBasedOnUsername)
+
 
 
 

@@ -342,7 +342,7 @@ export const commentPost = async (req, res) => {
     const comment = new Comment({
       userId: user._id,
       postId: post_id,
-      comment: commentBody,
+      body: commentBody,
     });
 
     await comment.save();
@@ -378,13 +378,9 @@ export const whatAreMyConnections = async (req, res) => {
           status_accepted: true,
         },
       ],
-    }).populate(
-      "userId connectionId",
-      "name username email profilePicture"
-    );
+    }).populate("userId connectionId", "name username email profilePicture");
 
     return res.json({ connections });
-
   } catch (err) {
     return res.status(500).json({
       message: err.message,
@@ -411,7 +407,6 @@ export const acceptConnectionRequest = async (req, res) => {
     return res.status(200).json({
       message: "Connection Request Accepted",
     });
-
   } catch (err) {
     return res.status(500).json({
       message: err.message,
@@ -419,4 +414,27 @@ export const acceptConnectionRequest = async (req, res) => {
   }
 };
 
+export const getUserProfileAndUserBasedOnUsername = async (req, res) => {
+  const { username } = req.query;
 
+  try {
+    const user = await User.findOne({
+      username,
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const userProfile = await Profile.findOne({ userId: user._id }).populate(
+      "userId",
+      "name username email profilePicture",
+    );
+
+    return res.json({ profile: userProfile });
+  } catch (err) {
+    return res.status(500).json({
+      message: err.message,
+    });
+  }
+};

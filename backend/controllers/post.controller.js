@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import Post from "../models/post.model.js";
+import Comment from "../models/comments.model.js";
 
 export const activeCheck = async (req, res) => {
   res.status(200).json({ message: "RUNNING" });
@@ -74,7 +75,7 @@ export const deletePost = async (req, res) => {
 };
 
 export const get_comment_by_post = async (req, res) => {
-  const { post_id } = req.body;
+  const { post_id } = req.query;
 
   try {
     const post = await Post.findOne({ _id: post_id });
@@ -82,8 +83,13 @@ export const get_comment_by_post = async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not Found" });
     }
+    const comments = await Comment.find({ postId: post_id }).populate(
+      "userId",
+      "username name",
+    );
+    return res.json(comments.reverse());
 
-    return res.json({ comments: post.comments });
+
   } catch (err) {
     return res.status(500).json({
       message: err.message,
@@ -124,9 +130,11 @@ export const increment_likes = async (req, res) => {
     if (!post) {
       return res.status(404).json({ message: "Post not found" });
     }
-
+    
     post.likes = post.likes + 1;
     await post.save();
+
+     return res.status(200).json({ message: "Like incremented", post });
   } catch (err) {
     return res.status(500).json({
       message: err.message,

@@ -102,3 +102,83 @@
     object-fit: cover;
     border-radius: 20px;
 }
+
+.optionsContainer{
+    display: flex;
+    height: 20%;
+    width: 100%;
+    justify-content: space-between;
+    padding-block:0.6rem;
+}
+
+.singleOption__optionsContainer{
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.singleOption__optionsContainer >svg{
+    height: 100%;
+    width: 8%;
+}
+
+.commentsContainer{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.allCommentsContainer{
+    width: min(680px, 92vw);
+    min-height: 60vh;
+    max-height: 80vh;
+    background: #ffffff;
+    border-radius: 18px;
+    overflow: hidden;
+    position: relative;
+    padding-left: 0.6rem;
+    padding-top: 0.6rem;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+}
+
+.postCommentContainer{
+    position: absolute;
+    bottom: 1.2rem;
+    left: 1.2rem;
+    width: 90%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+}
+
+.postCommentContainer >input{
+    flex: 0.9;
+    padding-inline: 1.5rem;
+    padding-block: 1.2rem;
+    border: none;
+    outline: none;
+    background-color: rgb(228,228,228);
+    border-radius: 10px;
+}
+
+.postCommentContainer >input:focus{
+    border: 1px solid silver;
+}
+
+.postCommentContainer__commentBtn{
+    flex: 0.1;
+    width: fit-content;
+    padding: 1.2rem;
+    background: orange;
+    border-radius: 10px;
+    text-align: center;
+    color: white;
+    cursor: pointer;
+}
