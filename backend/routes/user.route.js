@@ -51,12 +51,12 @@ router.route("/register").post(register);
 router.route("/login").post(login);
 router.route("/user_update").post(updateUserProfile)
 router.route("/get_user_and_profile").post(get_user_and_profile)
-router.route("/update_profile_data").post(updateProfileData);
+router.route("/update_profile_data").post(updateProfileData)
 
 router.route("/user/getAllUserProfile").get(getAllUserProfile)
 
 router.route("/user/download_resume").get(downloadProfile)
-router.route("/user/send_connecction_request").get(sendConnecionRequest)
+router.route("/user/send_connection_request").post(sendConnecionRequest)
 router.route("/user/getConnectionRequests").get(getMyConnectionRequest);
 
 router.route("/user/user_connection_request").post(whatAreMyConnections)

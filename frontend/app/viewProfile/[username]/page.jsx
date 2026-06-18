@@ -19,6 +19,7 @@ export default function ViewProfilePage() {
   const [userProfile, setUserProfile] = useState(null);
   const [userPosts, setUserPosts] = useState([]);
   const [isCurrentInConnection, setIsCurrentInConnection] = useState(false);
+  const [isConnectionNull, setIsConnectionNull] =useState(true);
 
   
 
@@ -44,30 +45,32 @@ export default function ViewProfilePage() {
 
 useEffect(() => {
   if (!postReducer?.posts) return;
-  let post = postReducer.posts.filter((post) => {
-    return post.userId.username === username;
+  const posts = postReducer.posts.filter((post) => {
+    return post.userId?.username === username;
   });
-  setUserPosts(post);
-}, [postReducer?.posts]);
+  setUserPosts(posts);
+}, [postReducer?.posts, username]);
 
 
   useEffect(() => {
 
-    console.log(authState.connections);
-    if (!userProfile) return;
+    if (!userProfile || !Array.isArray(authState.connections)) return;
 
     if (
       authState.connections.some(
-        (user) => user.connectionId._id === userProfile.userId._id
+        (user) => user.connectionId?._id === userProfile.userId._id
       )
     ) {
       setIsCurrentInConnection(true);
+      if(authState.connections.find(user => user.connectionId?._id === userProfile.userId._id).status_accepted ===true){
+        setIsConnectionNull(false)
+      }
     }
   }, [authState.connections, userProfile]);
 
 
   useEffect(() => {
-    getUserPost();
+    getUserPost()
   }, []);
 
   if (!userProfile) return <div>Loading...</div>; // guard, since data now arrives async
@@ -85,6 +88,7 @@ useEffect(() => {
             />
           </div>
 
+          {/* All Profile Deatils */}
           <div className={styles.profileContainer_details}>
             <div style={{ display: "flex", gap: "0.7rem" }}>
               <div style={{ flex: "0.8" }}>
@@ -100,7 +104,7 @@ useEffect(() => {
                 </div>
 
                 {isCurrentInConnection ? (
-                  <button className={styles.connectedButton}>Connected</button>
+                  <button className={styles.connectedButton}>{isConnectionNull ?"Pending":"Connected"}</button>
                 ) : (
                   <button
                     onClick={() => {
@@ -125,7 +129,7 @@ useEffect(() => {
               <div style={{ flex: "0.2" }}>
                 <h3>Recent Activity </h3>
                 {userPosts.map((post)=>{
-                  <div key={post._id} className={styles.postCard}>
+                  return <div key={post._id} className={styles.postCard}>
             
                     <div className={styles.card}>
                       <div className={styles.card_profileContainer}>
@@ -147,6 +151,25 @@ useEffect(() => {
 
 
           </div>
+
+          <div className="workHistory">
+            <h4>Work History</h4>
+            <div className={styles.workHistoryContainer}>
+              {
+                userProfile.pastwork.map((work,index)=>{
+                  return(
+                    <div key={index} className={styles.workHistoryCard}>
+                      <p style={{fontWeight:"bold", display:"flex",alignItems:"center",gap:"0.8rem"}}>{work.company} - {work.position}</p>
+                      <p>{work.years}</p>
+                    </div>
+                  )
+                })
+              }
+            </div>
+          </div>
+
+
+
         </div>
       </DashBoardLayout>
     </UserLayout>

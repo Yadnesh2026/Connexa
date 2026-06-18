@@ -294,6 +294,7 @@ export const sendConnecionRequest = async (req, res) => {
     });
 
     await request.save();
+    return res.status(200).json({ message: "Connection request sent", request });
   } catch (err) {
     return res.status(500).json({
       message: err.message,

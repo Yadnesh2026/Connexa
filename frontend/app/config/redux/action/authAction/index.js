@@ -81,20 +81,23 @@ export const getAllUsers = createAsyncThunk(
   },
 );
 
+//Connecect btn when sending request 
 export const sendConnectionRequest = createAsyncThunk(
-  "user/sendConnectionRequest",
+  "user/send_connection_request",
   async (user, thunkAPI) => {
     try {
       const response = await clientServer.post(
-        "/user/send_connecction_request",
+        "/user/send_connection_request",
         {
           token: user.token,
-          connectionId: user.user_id,
+          connectionId: user.user._id,
         },
       );
+
+      thunkAPI.dispatch(getConnectionReq({ token: user.token }));
       return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection request failed" });
     }
   },
 );
@@ -111,7 +114,7 @@ export const getConnectionReq = createAsyncThunk(
 
       return thunkAPI.fulfillWithValue(response.data.connections);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection requests not loaded" });
     }
   },
 );
@@ -142,9 +145,10 @@ export const AcceptConnection = createAsyncThunk(
           token: user.token,
           connection_id: user.connectionId,
           action_type: user.action,
-        });
+        },
+      );
 
-      return thunkAPI.fulfillWithValue(response.data)
+      return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
     }
