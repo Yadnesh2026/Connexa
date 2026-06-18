@@ -2,6 +2,8 @@ import User from "../models/user.model.js";
 import Profile from "../models/profile.model.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
+import path from "path";
+import { fileURLToPath } from "url";
 
 import PDFDocument from "pdfkit";
 import fs from "fs";
@@ -10,48 +12,61 @@ import ConnectionRequest from "../models/connections.model.js";
 import Post from "../models/post.model.js";
 import Comment from "../models/comments.model.js";
 
+const uploadsDir = fileURLToPath(new URL("../uploads/", import.meta.url));
+
 const convertUserDataToPDF = (userData) => {
   const doc = new PDFDocument();
 
   // Generate PDF filename
-  const outputPath = `uploads/${crypto.randomBytes(16).toString("hex")}.pdf`;
+  const fileName = `${crypto.randomBytes(16).toString("hex")}.pdf`;
+  const outputPath = path.join(uploadsDir, fileName);
 
+  fs.mkdirSync(uploadsDir, { recursive: true });
   const stream = fs.createWriteStream(outputPath);
 
   doc.pipe(stream);
 
   // Profile Picture
-  if (userData.userId.profilePicture) {
-    doc.image(`uploads/${userData.userId.profilePicture}`, {
-      align: "center",
-      width: 100,
-    });
+  const profilePicture = path.basename(userData.userId?.profilePicture || "");
+  const profilePicturePath = path.join(uploadsDir, profilePicture);
+  if (userData.userId.profilePicture && fs.existsSync(profilePicturePath)) {
+    try {
+      doc.image(profilePicturePath, {
+        align: "center",
+        width: 100,
+      });
+    } catch (err) {
+      doc.fontSize(12).text("Profile image could not be added.");
+    }
   }
 
   doc.moveDown();
 
   // User Information
-  doc.fontSize(14).text(`Name: ${userData.userId.name}`);
-  doc.fontSize(14).text(`Email: ${userData.userId.email}`);
-  doc.fontSize(14).text(`Username: ${userData.userId.username}`);
-  doc.fontSize(14).text(`Bio: ${userData.bio}`);
-  doc.fontSize(14).text(`Current Position: ${userData.currentPosition}`);
+  doc.fontSize(14).text(`Name: ${userData.userId?.name || ""}`);
+  doc.fontSize(14).text(`Email: ${userData.userId?.email || ""}`);
+  doc.fontSize(14).text(`Username: ${userData.userId?.username || ""}`);
+  doc.fontSize(14).text(`Bio: ${userData.bio || ""}`);
+  doc.fontSize(14).text(`Current Position: ${userData.currentPost || ""}`);
 
   doc.moveDown();
 
   // Past Work
   doc.fontSize(16).text("Past Work:");
 
-  userData.pastWork.forEach((work, index) => {
+  const pastWork = Array.isArray(userData.pastwork) ? userData.pastwork : [];
+  pastWork.forEach((work) => {
     doc.moveDown(0.5);
-    doc.fontSize(14).text(`Company Name: ${work.companyName}`);
-    doc.fontSize(14).text(`Position: ${work.position}`);
-    doc.fontSize(14).text(`Year: ${work.years}`);
+    doc.fontSize(14).text(`Company Name: ${work.company || ""}`);
+    doc.fontSize(14).text(`Position: ${work.position || ""}`);
+    doc.fontSize(14).text(`Year: ${work.years || ""}`);
   });
 
-  doc.end();
-
-  return outputPath;
+  return new Promise((resolve, reject) => {
+    stream.on("finish", () => resolve(`/${fileName}`));
+    stream.on("error", reject);
+    doc.end();
+  });
 };
 
 //Register User
@@ -251,7 +266,11 @@ export const downloadProfile = async (req, res) => {
       userId: user_id,
     }).populate("userId", "name username email profilePicture");
 
-    const outputPath = convertUserDataToPDF(userProfile);
+    if (!userProfile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
+
+    const outputPath = await convertUserDataToPDF(userProfile);
 
     return res.json({ outputPath });
   } catch (err) {
