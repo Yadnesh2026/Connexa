@@ -14,7 +14,7 @@
     flex-direction: column;
     gap: 1.2rem;
     align-items: start;
-
+    border-right: 1px solid rgb(225, 220, 220);
 }
 
 .sideBarOption{
@@ -53,3 +53,11 @@ transform: scale(1.04);
     background: #f0f0f0;
 }
 
+.HomeConatiner_extraContainer{
+    border-left: 1px solid rgb(225, 220, 220);
+    padding-left: 1.2rem;
+
+}
+.HomeContainer_feedConatiner{
+    padding-inline: 0.8rem;
+}

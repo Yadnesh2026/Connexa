@@ -15,7 +15,7 @@ function NavBarComponent() {
     <div className={styles.container}>
       <nav className={styles.navbar}>
         <h1 style={{ cursor: "pointer" }} onClick={() => router.push("/")}>
-          Pro Connect
+          Connexa
         </h1>
 
         <div className={styles.navBarOptionContainer}>

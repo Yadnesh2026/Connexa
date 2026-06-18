@@ -108,9 +108,9 @@ export default function DashBoardLayout({ children }) {
             </div>
           </div>
 
-          <div className="HomeContainer-feedConatiner">{children}</div>
+          <div className={styles.HomeContainer_feedConatiner}>{children}</div>
 
-          <div className="HomeConatiner-extraContainer">
+          <div className={styles.HomeConatiner_extraContainer}>
 
             <h3>Top Profiles</h3>
             {authState.all_profiles_fetched && authState.all_users.map((Profile)=>{

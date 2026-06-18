@@ -302,7 +302,8 @@ export const sendConnecionRequest = async (req, res) => {
 };
 
 export const getMyConnectionRequest = async (req, res) => {
-  const { token } = req.body;
+  // console.log(req.body);
+  const { token } = req.query;
 
   try {
     const user = await User.findOne({ token });
@@ -312,8 +313,14 @@ export const getMyConnectionRequest = async (req, res) => {
     }
 
     //request already send if they have sendd already request
-    const connections = await ConnectionRequest.find({ userId: user._id })
-      .populate;
+    const connections = await ConnectionRequest.find({
+      userId: user._id,
+    }).populate("connectionId");
+
+     return res.status(200).json({
+      connections,
+    });
+
   } catch (err) {
     return res.status(500).json({
       message: err.message,
