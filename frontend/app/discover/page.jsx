@@ -28,12 +28,12 @@ export default function DiscoverPage() {
           <h1>Discover Page</h1>
 
           <div className={styles.allUserProfile}>
-            {authState.all_profiles_fetched && allUsers.map((user)=>{
+            {authState.all_profiles_fetched && allUsers.filter((user) => user.userId?.username).map((user)=>{
               return(
                 <div onClick={()=>{
                   router.push(`/viewProfile/${user.userId.username}`)
                 }} key={user._id} className={styles.userCard}>
-                  <img className={styles.userCard_image} src={`${baseURL}/${user.userId.profilePicture}`} alt="profile"/>
+                  <img className={styles.userCard_image} src={`${baseURL}/${user.userId.profilePicture || "default.jpg"}`} alt="profile"/>
                   <div>
                      <h1>{user.userId.name}</h1>
                      <p>{user.userId.username}</p>

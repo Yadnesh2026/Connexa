@@ -8,7 +8,7 @@ import DashBoardLayout from "../../layout/DashBoardLayout/Page";
 import { clientServer, baseURL } from "../../config";
 import styles from "../styles.module.css";
 import {getAllPosts} from "../../config/redux/action/postAction"
-import {getConnectionReq,sendConnectionRequest} from "../../config/redux/action/authAction"
+import {getConnectionReq,getMyConnectionRequests,sendConnectionRequest} from "../../config/redux/action/authAction"
 
 export default function ViewProfilePage() {
   const { username } = useParams();           // <-- replaces "await params"
@@ -20,17 +20,30 @@ export default function ViewProfilePage() {
   const [userPosts, setUserPosts] = useState([]);
   const [isCurrentInConnection, setIsCurrentInConnection] = useState(false);
   const [isConnectionNull, setIsConnectionNull] =useState(true);
+  const [profileError, setProfileError] = useState("");
 
   
 
   // fetch the profile on the client instead of awaiting it in the component body
   useEffect(() => {
     const fetchProfile = async () => {
-      const request = await clientServer.get(
-        "/user/getUserProfileAndUserBasedOnUsername",
-        { params: { username } }
-      );
-      setUserProfile(request.data.profile);
+      try {
+        setProfileError("");
+        setUserProfile(null);
+        const request = await clientServer.get(
+          "/user/getUserProfileAndUserBasedOnUsername",
+          { params: { username } }
+        );
+
+        if (!request.data.profile) {
+          setProfileError("Profile not found");
+          return;
+        }
+
+        setUserProfile(request.data.profile);
+      } catch (err) {
+        setProfileError(err.response?.data?.message || "Profile not found");
+      }
     };
     if (username) fetchProfile();
   }, [username]);
@@ -41,6 +54,8 @@ export default function ViewProfilePage() {
   const getUserPost = async () => {
     await dispatch(getAllPosts());
     await dispatch(getConnectionReq({ token: localStorage.getItem("token") }));
+    await dispatch(getMyConnectionRequests({token:localStorage.getItem("token")}))
+
   };
 
 useEffect(() => {
@@ -52,26 +67,50 @@ useEffect(() => {
 }, [postReducer?.posts, username]);
 
 
+
+
   useEffect(() => {
 
-    if (!userProfile || !Array.isArray(authState.connections)) return;
+    if (!userProfile) return;
 
-    if (
-      authState.connections.some(
-        (user) => user.connectionId?._id === userProfile.userId._id
-      )
-    ) {
-      setIsCurrentInConnection(true);
-      if(authState.connections.find(user => user.connectionId?._id === userProfile.userId._id).status_accepted ===true){
-        setIsConnectionNull(false)
-      }
-    }
-  }, [authState.connections, userProfile]);
+    const profileUserId = userProfile.userId._id;
+    const sentRequests = Array.isArray(authState.connections) ? authState.connections : [];
+    const receivedOrAcceptedRequests = Array.isArray(authState.connectionRequest)
+      ? authState.connectionRequest
+      : [];
+
+    const existingConnection = [...sentRequests, ...receivedOrAcceptedRequests].find((connection) => {
+      return (
+        connection.userId?._id === profileUserId ||
+        connection.connectionId?._id === profileUserId
+      );
+    });
+
+    setIsCurrentInConnection(Boolean(existingConnection));
+    setIsConnectionNull(existingConnection?.status_accepted !== true);
+
+  }, [authState.connections, userProfile, authState.connectionRequest]);
+
+
+
+
 
 
   useEffect(() => {
     getUserPost()
   }, []);
+
+  if (profileError) {
+    return (
+      <UserLayout>
+        <DashBoardLayout>
+          <div className={styles.container}>
+            <h2>{profileError}</h2>
+          </div>
+        </DashBoardLayout>
+      </UserLayout>
+    );
+  }
 
   if (!userProfile) return <div>Loading...</div>; // guard, since data now arrives async
 
@@ -82,7 +121,7 @@ useEffect(() => {
           <div className={styles.backDropContainer}>
             <img
               className={styles.backDrop}
-              src={`${baseURL}/${userProfile.userId.profilePicture}`}
+              src={`${baseURL}/${userProfile.userId?.profilePicture || "default.jpg"}`}
               alt="profile"
               width={150}
             />
@@ -99,8 +138,8 @@ useEffect(() => {
                     alignItems: "center",
                   }}
                 >
-                  <h2>{userProfile.userId.name}</h2>
-                  <p style={{ color: "grey" }}>@{userProfile.userId.username}</p>
+                  <h2>{userProfile.userId?.name}</h2>
+                  <p style={{ color: "grey" }}>@{userProfile.userId?.username}</p>
                 </div>
 
                 <div style={{display:"flex",alignItems:"center",gap:"1.2rem"}}>
@@ -108,13 +147,17 @@ useEffect(() => {
                       <button className={styles.connectedButton}>{isConnectionNull ?"Pending":"Connected"}</button>
                     ) : (
                       <button
-                        onClick={() => {
-                          dispatch(
+                        onClick={async () => {
+                          await dispatch(
                             sendConnectionRequest({
                               token: localStorage.getItem("token"),
                               user: userProfile.userId,
                             })
                           );
+                          setIsCurrentInConnection(true);
+                          setIsConnectionNull(true);
+                          dispatch(getConnectionReq({ token: localStorage.getItem("token") }));
+                          dispatch(getMyConnectionRequests({token:localStorage.getItem("token")}));
                         }}
                         className={styles.connectBtn}
                       >
@@ -124,7 +167,7 @@ useEffect(() => {
 
                     <div onClick={async()=>{
                       try {
-                        const response = await clientServer.get(`/user/download_resume?id=${userProfile.userId._id}`);
+                        const response = await clientServer.get(`/user/download_resume?id=${userProfile.userId?._id}`);
                         const outputPath = response.data.outputPath;
 
                         if (!outputPath) {
@@ -179,7 +222,7 @@ useEffect(() => {
             <h4>Work History</h4>
             <div className={styles.workHistoryContainer}>
               {
-                userProfile.pastwork.map((work,index)=>{
+                (userProfile.pastwork || []).map((work,index)=>{
                   return(
                     <div key={index} className={styles.workHistoryCard}>
                       <p style={{fontWeight:"bold", display:"flex",alignItems:"center",gap:"0.8rem"}}>{work.company} - {work.position}</p>

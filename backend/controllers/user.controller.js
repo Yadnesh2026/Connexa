@@ -81,10 +81,10 @@ export const register = async (req, res) => {
 
     //for user is already registered
     const user = await User.findOne({
-      email,
+      $or: [{ email }, { username }],
     });
     if (user) {
-      return res.status(400).json({ message: "The User us already Registerd" });
+      return res.status(400).json({ message: "User is already registered" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -104,6 +104,12 @@ export const register = async (req, res) => {
     return res.json({ message: "User Created" });
   } catch (err) {
     console.log(err);
+
+    if (err.code === 11000) {
+      return res.status(400).json({
+        message: "User is already registered",
+      });
+    }
 
     return res.status(500).json({
       message: "Registered Issue",
@@ -304,7 +310,10 @@ export const sendConnecionRequest = async (req, res) => {
     });
 
     if (exisitngRequest) {
-      return res.status(400).json({ message: "reqquest already sent " });
+      return res.status(200).json({
+        message: "Connection request already sent",
+        request: exisitngRequest,
+      });
     }
 
     const request = new ConnectionRequest({
@@ -395,8 +404,20 @@ export const whatAreMyConnections = async (req, res) => {
     }
 
     const connections = await ConnectionRequest.find({
-      connectionId: user._id,
-      status_accepted: null,
+      $or: [
+        {
+          connectionId: user._id,
+          status_accepted: null,
+        },
+        {
+          userId: user._id,
+          status_accepted: true,
+        },
+        {
+          connectionId: user._id,
+          status_accepted: true,
+        },
+      ],
     }).populate("userId connectionId", "name username email profilePicture");
 
     return res.json({ connections });
@@ -449,6 +470,10 @@ export const getUserProfileAndUserBasedOnUsername = async (req, res) => {
       "userId",
       "name username email profilePicture",
     );
+
+    if (!userProfile) {
+      return res.status(404).json({ message: "Profile not found" });
+    }
 
     return res.json({ profile: userProfile });
   } catch (err) {

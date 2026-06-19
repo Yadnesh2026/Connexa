@@ -28,7 +28,7 @@ export const loginUser = createAsyncThunk(
       //login success
       return thunkAPI.fulfillWithValue(response.data.token);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Login failed" });
     }
   },
 );
@@ -46,7 +46,7 @@ export const registerUser = createAsyncThunk(
 
       return thunkAPI.fulfillWithValue(request.data);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Registration failed" });
     }
   },
 );
@@ -63,7 +63,7 @@ export const getAboutUser = createAsyncThunk(
 
       return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "User profile not loaded" });
     }
   },
 );
@@ -112,7 +112,7 @@ export const getConnectionReq = createAsyncThunk(
         },
       });
 
-      return thunkAPI.fulfillWithValue(response.data);
+      return thunkAPI.fulfillWithValue(response.data.connections);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection requests not loaded" });
     }
@@ -149,6 +149,7 @@ export const AcceptConnection = createAsyncThunk(
         },
       );
 
+      thunkAPI.dispatch(getConnectionReq({ token: user.token }));
       thunkAPI.dispatch(getMyConnectionRequests({ token: user.token }));
       return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {

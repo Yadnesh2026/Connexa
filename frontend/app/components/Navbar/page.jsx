@@ -1,16 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import styles from "./styles.module.css";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { reset } from "@/app/config/redux/reducer/authReducer";
+import { reset, setTokenisThere } from "@/app/config/redux/reducer/authReducer";
+import { getAboutUser } from "@/app/config/redux/action/authAction";
 
 function NavBarComponent() {
   const router = useRouter();
   const authState = useSelector((state) => state.auth);
   const dispatch =useDispatch()
-  console.log(authState);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (token && !authState.ProfileFetched) {
+      dispatch(setTokenisThere());
+      dispatch(getAboutUser({ token })).then((result) => {
+        if (getAboutUser.rejected.match(result)) {
+          localStorage.removeItem("token");
+          dispatch(reset());
+        }
+      });
+    }
+  }, [authState.ProfileFetched, dispatch]);
+
+  const isSignedIn = authState.ProfileFetched || authState.isTokenThere;
+  const displayName = authState.user?.userId?.name || authState.user?.userId?.username;
+
   return (
     <div className={styles.container}>
       <nav className={styles.navbar}>
@@ -20,11 +38,11 @@ function NavBarComponent() {
 
         <div className={styles.navBarOptionContainer}>
           
-          {authState.ProfileFetched && (
+          {isSignedIn && (
             <div className={styles.signedInControls}>
                 
-                {authState.user?.userId && (
-                  <p>Hey, {authState.user.userId.name}</p>
+                {displayName && (
+                  <p>Hey, {displayName}</p>
                 )}
 
                 <button
@@ -32,6 +50,11 @@ function NavBarComponent() {
                   className={styles.iconButton}
                   aria-label="Profile"
                   title="Profile"
+                  onClick={() => {
+                    if (authState.user?.userId?.username) {
+                      router.push(`/viewProfile/${authState.user.userId.username}`);
+                    }
+                  }}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -76,7 +99,7 @@ function NavBarComponent() {
             </div>
           )}
 
-          {!authState.ProfileFetched && (
+          {!isSignedIn && (
             <div
               onClick={() => {
                 router.push("/login")

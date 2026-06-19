@@ -19,12 +19,19 @@ export default function Login() {
   const [username, setUsername] = useState("")
   const [name, setName]= useState("")  
   const [password, setPassword] = useState("")
+  const statusMessage = typeof authState.message === "string"
+    ? authState.message
+    : authState.message?.message;
 
   useEffect(() => {
     if (authState.loggedIn) {
-      router.push("/dashboard");
+      const redirectTimer = setTimeout(() => {
+        router.push("/dashboard");
+      }, 900);
+
+      return () => clearTimeout(redirectTimer);
     }
-  },[authState.loggedIn]);
+  },[authState.loggedIn, router]);
 
   useEffect(()=>{
 
@@ -48,7 +55,11 @@ export default function Login() {
       email,
       name,
     })
-  );
+  ).then((result) => {
+    if (registerUser.fulfilled.match(result)) {
+      setUserLogin(true);
+    }
+  });
 };
 
 const handleLogin =()=>{
@@ -69,7 +80,11 @@ const handleLogin =()=>{
             <p className={styles.cardLeftHeading}>
               {userLogin ? "Sign In" : "Sign Up"}
             </p>
-              <p style={{color:authState.isError ?"red":"green"}}>{authState.message.message}</p> 
+              {statusMessage && (
+                <p className={authState.isError ? styles.errorMessage : styles.successMessage}>
+                  {statusMessage}
+                </p>
+              )}
 
             <div className={styles.inputContainers}>
 

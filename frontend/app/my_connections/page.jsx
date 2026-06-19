@@ -15,6 +15,16 @@ export default function MyConnectionsPage() {
   const router = useRouter()
   const connectionRequests = authState.connectionRequest || [];
   const pendingRequests = connectionRequests.filter((connection)=> connection.status_accepted === null);
+  const acceptedConnections = connectionRequests.filter((connection)=> connection.status_accepted === true);
+  const currentUserId = authState.user?.userId?._id;
+
+  const getConnectionUser = (connection) => {
+    if (connection.userId?._id === currentUserId) {
+      return connection.connectionId;
+    }
+
+    return connection.userId;
+  };
 
   useEffect(() => {
     dispatch(getMyConnectionRequests({ token: localStorage.getItem("token") }));
@@ -28,46 +38,118 @@ export default function MyConnectionsPage() {
   return (
     <UserLayout>
       <DashBoardLayout>
-        <div>
-          <h1>My Connections</h1>
+        <div className={styles.page}>
+          <div className={styles.header}>
+            <div>
+              <p className={styles.eyebrow}>Network</p>
+              <h1>My Connections</h1>
+            </div>
+            <div className={styles.stats}>
+              <div>
+                <strong>{pendingRequests.length}</strong>
+                <span>Pending</span>
+              </div>
+              <div>
+                <strong>{acceptedConnections.length}</strong>
+                <span>Connected</span>
+              </div>
+            </div>
+          </div>
 
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>Connection Requests</h2>
+              <span>{pendingRequests.length}</span>
+            </div>
 
-          {pendingRequests.length === 0 && <h1>No Connection Request Pending </h1>}
+            {pendingRequests.length === 0 ? (
+              <div className={styles.emptyState}>
+                <h3>No Pending Requests</h3>
+                <p>New connection requests will appear here.</p>
+              </div>
+            ) : (
+              <div className={styles.list}>
+                {pendingRequests.map((connection) => {
+                  const user = connection.userId;
 
-          {pendingRequests.length !== 0 &&
-            pendingRequests.map((user) => {
-              return (
-                <div onClick={()=>{
-                  router.push(`/viewProfile/${user.userId?.username}`)
-                }} className={styles.userCard} key={user._id}>
-                  <div style={{ display: "flex", alignItems: "center",gap:"1.2rem",justifyContent:"space-between" }}>
-                    <div className={styles.profilePicture}>
-                      <img
-                        src={`${baseURL}/${user.userId?.profilePicture || "default.jpg"}`}
-                        alt=""
-                      />
+                  return (
+                    <div
+                      onClick={() => router.push(`/viewProfile/${user?.username}`)}
+                      className={styles.userCard}
+                      key={connection._id}
+                    >
+                      <div className={styles.profilePicture}>
+                        <img
+                          src={`${baseURL}/${user?.profilePicture || "default.jpg"}`}
+                          alt={user?.name || "Profile"}
+                        />
+                      </div>
+                      <div className={styles.userInfo}>
+                        <h3>{user?.name}</h3>
+                        <p>@{user?.username}</p>
+                      </div>
+                      <button
+                        onClick={(e)=>{
+                          e.stopPropagation()
+
+                          dispatch(AcceptConnection({
+                            connectionId:connection._id,
+                            token:localStorage.getItem("token"),
+                            action:"accept"
+                          }))
+                        }}
+                        className={styles.connectedButton}
+                      >
+                        Accept
+                      </button>
                     </div>
-                    <div className={styles.userInfo}>
-                      <h3>{user.userId?.name}</h3>
-                      <p>{user.userId?.username}</p>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          <section className={styles.section}>
+            <div className={styles.sectionHeader}>
+              <h2>My Network</h2>
+              <span>{acceptedConnections.length}</span>
+            </div>
+
+            {acceptedConnections.length === 0 ? (
+              <div className={styles.emptyState}>
+                <h3>No Connections Yet</h3>
+                <p>Accepted connections will be listed here.</p>
+              </div>
+            ) : (
+              <div className={styles.list}>
+                {acceptedConnections.map((connection)=>{
+                  const user = getConnectionUser(connection);
+
+                  return (
+                    <div
+                      onClick={() => router.push(`/viewProfile/${user?.username}`)}
+                      className={styles.userCard}
+                      key={connection._id}
+                    >
+                      <div className={styles.profilePicture}>
+                        <img
+                          src={`${baseURL}/${user?.profilePicture || "default.jpg"}`}
+                          alt={user?.name || "Profile"}
+                        />
+                      </div>
+                      <div className={styles.userInfo}>
+                        <h3>{user?.name}</h3>
+                        <p>@{user?.username}</p>
+                      </div>
+                      <span className={styles.statusPill}>Connected</span>
                     </div>
-                     <button onClick={(e)=>{
-                      e.stopPropagation()
-
-                      dispatch(AcceptConnection({
-                        connectionId:user._id,
-                        token:localStorage.getItem("token"),
-                        action:"accept"
-                      }))
-                     }} className={styles.connectedButton}>Accept</button>
-                  </div>
-                </div>
-              );
-            })}
-
-      
+                  )
+                })}
+              </div>
+            )}
+          </section>
         </div>
       </DashBoardLayout>
     </UserLayout>
-  );
+  )
 }
