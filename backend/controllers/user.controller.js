@@ -395,16 +395,8 @@ export const whatAreMyConnections = async (req, res) => {
     }
 
     const connections = await ConnectionRequest.find({
-      $or: [
-        {
-          userId: user._id,
-          status_accepted: true,
-        },
-        {
-          connectionId: user._id,
-          status_accepted: true,
-        },
-      ],
+      connectionId: user._id,
+      status_accepted: null,
     }).populate("userId connectionId", "name username email profilePicture");
 
     return res.json({ connections });

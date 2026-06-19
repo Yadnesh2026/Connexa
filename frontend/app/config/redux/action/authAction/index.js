@@ -112,7 +112,7 @@ export const getConnectionReq = createAsyncThunk(
         },
       });
 
-      return thunkAPI.fulfillWithValue(response.data.connections);
+      return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection requests not loaded" });
     }
@@ -123,14 +123,15 @@ export const getMyConnectionRequests = createAsyncThunk(
   "user/user_connection_request",
   async (user, thunkAPI) => {
     try {
-      const response = await clientServer.get("/user/user_connection_request", {
-        params: {
+      const response = await clientServer.post(
+        "/user/user_connection_request",
+        {
           token: user.token,
         },
-      });
+      );
       return thunkAPI.fulfillWithValue(response.data.connections);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection requests not loaded" });
     }
   },
 );
@@ -143,14 +144,15 @@ export const AcceptConnection = createAsyncThunk(
         "/user/accept_connection_request",
         {
           token: user.token,
-          connection_id: user.connectionId,
+          requestId: user.connectionId,
           action_type: user.action,
         },
       );
 
+      thunkAPI.dispatch(getMyConnectionRequests({ token: user.token }));
       return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
-      return thunkAPI.rejectWithValue(err.response.data);
+      return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection request not updated" });
     }
   },
 );
