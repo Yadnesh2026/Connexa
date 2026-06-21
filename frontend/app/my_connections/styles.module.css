@@ -162,6 +162,15 @@
   font-weight: 700;
 }
 
+.pendingPill {
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #b45309;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .emptyState {
   padding: 1.3rem;
   border: 1px dashed #d5d5d5;

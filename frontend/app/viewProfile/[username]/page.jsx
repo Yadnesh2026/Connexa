@@ -13,7 +13,7 @@ import {getConnectionReq,getMyConnectionRequests,sendConnectionRequest} from "..
 export default function ViewProfilePage() {
   const { username } = useParams();           // <-- replaces "await params"
   const dispatch = useDispatch();
-  const postReducer = useSelector((state) => state.postReducer);
+  const postReducer = useSelector((state) => state.posts);
   const authState = useSelector((state) => state.auth);
 
   const [userProfile, setUserProfile] = useState(null);

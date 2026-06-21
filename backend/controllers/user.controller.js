@@ -406,6 +406,10 @@ export const whatAreMyConnections = async (req, res) => {
     const connections = await ConnectionRequest.find({
       $or: [
         {
+          userId: user._id,
+          status_accepted: null,
+        },
+        {
           connectionId: user._id,
           status_accepted: null,
         },

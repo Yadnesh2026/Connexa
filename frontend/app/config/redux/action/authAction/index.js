@@ -95,6 +95,7 @@ export const sendConnectionRequest = createAsyncThunk(
       );
 
       thunkAPI.dispatch(getConnectionReq({ token: user.token }));
+      thunkAPI.dispatch(getMyConnectionRequests({ token: user.token }));
       return thunkAPI.fulfillWithValue(response.data);
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response?.data || { message: "Connection request failed" });

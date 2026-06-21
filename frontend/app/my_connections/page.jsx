@@ -18,6 +18,13 @@ export default function MyConnectionsPage() {
   const acceptedConnections = connectionRequests.filter((connection)=> connection.status_accepted === true);
   const currentUserId = authState.user?.userId?._id;
 
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(getMyConnectionRequests({ token }));
+    }
+  }, [dispatch]);
+
   const getConnectionUser = (connection) => {
     if (connection.userId?._id === currentUserId) {
       return connection.connectionId;
@@ -26,15 +33,10 @@ export default function MyConnectionsPage() {
     return connection.userId;
   };
 
-  useEffect(() => {
-    dispatch(getMyConnectionRequests({ token: localStorage.getItem("token") }));
-  }, [dispatch]);
+  const isIncomingRequest = (connection) => {
+    return connection.connectionId?._id === currentUserId;
+  };
 
-  useEffect(() => {
-    if (connectionRequests.length !== 0) {
-      console.log(connectionRequests);
-    }
-  }, [connectionRequests]);
   return (
     <UserLayout>
       <DashBoardLayout>
@@ -70,7 +72,8 @@ export default function MyConnectionsPage() {
             ) : (
               <div className={styles.list}>
                 {pendingRequests.map((connection) => {
-                  const user = connection.userId;
+                  const user = getConnectionUser(connection);
+                  const incoming = isIncomingRequest(connection);
 
                   return (
                     <div
@@ -88,20 +91,24 @@ export default function MyConnectionsPage() {
                         <h3>{user?.name}</h3>
                         <p>@{user?.username}</p>
                       </div>
-                      <button
-                        onClick={(e)=>{
-                          e.stopPropagation()
+                      {incoming ? (
+                        <button
+                          onClick={(e)=>{
+                            e.stopPropagation()
 
-                          dispatch(AcceptConnection({
-                            connectionId:connection._id,
-                            token:localStorage.getItem("token"),
-                            action:"accept"
-                          }))
-                        }}
-                        className={styles.connectedButton}
-                      >
-                        Accept
-                      </button>
+                            dispatch(AcceptConnection({
+                              connectionId:connection._id,
+                              token:localStorage.getItem("token"),
+                              action:"accept"
+                            }))
+                          }}
+                          className={styles.connectedButton}
+                        >
+                          Accept
+                        </button>
+                      ) : (
+                        <span className={styles.pendingPill}>Sent</span>
+                      )}
                     </div>
                   );
                 })}

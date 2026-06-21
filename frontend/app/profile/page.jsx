@@ -1,186 +1,488 @@
-import React, { useState } from 'react'
-import UserLayout from '../layout/UserLayout/page'
-import DashBoardLayout from '../layout/DashBoardLayout/Page'
-import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { getAboutUser } from '../config/redux/action/authAction'
-import styles from "./styles.module.css"
-import { baseURL, clientServer } from '../config'
-import { getAllPosts } from '../config/redux/action/postAction'
+"use client";
+
+import React, { useEffect, useMemo, useState } from "react";
+import UserLayout from "../layout/UserLayout/page";
+import DashBoardLayout from "../layout/DashBoardLayout/Page";
+import { useDispatch, useSelector } from "react-redux";
+import { getAboutUser } from "../config/redux/action/authAction";
+import { getAllPosts } from "../config/redux/action/postAction";
+import { baseURL, clientServer } from "../config";
+import styles from "./styles.module.css";
+
+const emptyWork = { company: "", position: "", years: "" };
+const emptyEducation = { school: "", degree: "", feildofStudy: "" };
 
 export default function ProfilePage() {
-    const dispatch = useDispatch()
-    const authState = useSelector((state)=>state.auth)
-    const [userProfile,setUserProfile]= useState({})
-    const [userPosts,setUserPost] =useState([])
-    const postReducer =useSelector((state)=>state.postReducer)
-    const [isModelOpen, setIsModelOpen] = useState(false);
-    const [inputData, setInputData] = useState({company:'', position:'', years:''})
+  const dispatch = useDispatch();
+  const authState = useSelector((state) => state.auth);
+  const postReducer = useSelector((state) => state.posts);
 
-    const handleWorkInputChange = (e)=>{
-      const {name,value} = e.target;
-      setInputData({...inputData,[name]:value})
+  const [userProfile, setUserProfile] = useState(null);
+  const [workInput, setWorkInput] = useState(emptyWork);
+  const [educationInput, setEducationInput] = useState(emptyEducation);
+  const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
+  const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [statusMessage, setStatusMessage] = useState("");
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(getAboutUser({ token }));
     }
-    // const [userProfile,setUserProfile] = useState({
-    //     userId:{
-    //         name:"",
-    //         username:"",
-    //         profilePicture:""
-    //     },
-    //     bio:"",
-    //     pastwork:[]
-    // })
+    dispatch(getAllPosts());
+  }, [dispatch]);
 
+  useEffect(() => {
+    if (authState.user?.userId) {
+      setUserProfile(authState.user);
+    }
+  }, [authState.user]);
 
+  const userPosts = useMemo(() => {
+    const username = userProfile?.userId?.username;
+    if (!username) return [];
 
-    useEffect(()=>{
-        dispatchEvent(getAboutUser({token:localStorage.getItem("token")}))
-        dispatch(getAllPosts())
-    },[])
+    return (postReducer.posts || []).filter(
+      (post) => post.userId?.username === username,
+    );
+  }, [postReducer.posts, userProfile?.userId?.username]);
 
+  const saveProfile = async (nextProfile, successText) => {
+    const token = localStorage.getItem("token");
 
+    if (!token) {
+      setStatusMessage("Please sign in again to update your profile.");
+      return false;
+    }
 
-    useEffect(()=>{
+    setIsSaving(true);
+    setStatusMessage("");
 
-      if(authState.user != undefined){
-      setUserProfile(authState.user)
+    try {
+      await clientServer.post("/update_profile_data", {
+        token,
+        bio: nextProfile.bio || "",
+        currentPost: nextProfile.currentPost || "",
+        pastwork: nextProfile.pastwork || [],
+        education: nextProfile.education || [],
+      });
 
-        let post = postReducer.posts.filter((post)=>{
-          return post.userId.username === authState.user.userId.username
-        })
-      setUserPosts(posts);
+      setUserProfile(nextProfile);
+      await dispatch(getAboutUser({ token }));
+      setStatusMessage(successText || "Profile updated successfully.");
+      return true;
+    } catch (err) {
+      setStatusMessage(
+        err.response?.data?.message || "Profile could not be updated.",
+      );
+      return false;
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
-      }
+  const handleProfileFieldChange = (event) => {
+    const { name, value } = event.target;
+    setUserProfile((current) => ({ ...current, [name]: value }));
+  };
 
-    },[authState.user,postReducer.posts])
+  const handleProfilePictureChange = async (event) => {
+    const file = event.target.files?.[0];
+    const token = localStorage.getItem("token");
 
-    const response =await clientServer.post("/update_profile_data",{
-      token:localStorage.getItem("token"),
-      bio:userProfile.bio,
-      currentPost: userProfile.currentPost,
-      pastwork:userProfile.pastwork,
-      education:userProfile.education
-    })
-    dispatch(getAboutUser({token:localStorage.getItem("token")}))
+    if (!file || !token) return;
+
+    const formData = new FormData();
+    formData.append("token", token);
+    formData.append("profile", file);
+
+    setIsSaving(true);
+    setStatusMessage("");
+
+    try {
+      await clientServer.post("/upload_profile", formData);
+      await dispatch(getAboutUser({ token }));
+      setStatusMessage("Profile photo updated.");
+    } catch (err) {
+      setStatusMessage(
+        err.response?.data?.message || "Profile photo could not be uploaded.",
+      );
+    } finally {
+      setIsSaving(false);
+      event.target.value = "";
+    }
+  };
+
+  const handleAddWork = async () => {
+    if (!workInput.company.trim() && !workInput.position.trim()) {
+      setStatusMessage("Add company or position before saving work.");
+      return;
+    }
+
+    const nextProfile = {
+      ...userProfile,
+      pastwork: [...(userProfile.pastwork || []), workInput],
+    };
+
+    const saved = await saveProfile(nextProfile, "Work experience added.");
+    if (saved) {
+      setWorkInput(emptyWork);
+      setIsWorkModalOpen(false);
+    }
+  };
+
+  const handleRemoveWork = async (indexToRemove) => {
+    const nextProfile = {
+      ...userProfile,
+      pastwork: (userProfile.pastwork || []).filter(
+        (_, index) => index !== indexToRemove,
+      ),
+    };
+
+    await saveProfile(nextProfile, "Work experience removed.");
+  };
+
+  const handleAddEducation = async () => {
+    if (!educationInput.school.trim() && !educationInput.degree.trim()) {
+      setStatusMessage("Add school or degree before saving education.");
+      return;
+    }
+
+    const nextProfile = {
+      ...userProfile,
+      education: [...(userProfile.education || []), educationInput],
+    };
+
+    const saved = await saveProfile(nextProfile, "Education added.");
+    if (saved) {
+      setEducationInput(emptyEducation);
+      setIsEducationModalOpen(false);
+    }
+  };
+
+  const handleRemoveEducation = async (indexToRemove) => {
+    const nextProfile = {
+      ...userProfile,
+      education: (userProfile.education || []).filter(
+        (_, index) => index !== indexToRemove,
+      ),
+    };
+
+    await saveProfile(nextProfile, "Education removed.");
+  };
+
+  if (!userProfile?.userId) {
+    return (
+      <UserLayout>
+        <DashBoardLayout>
+          <div className={styles.loadingState}>Loading your profile...</div>
+        </DashBoardLayout>
+      </UserLayout>
+    );
   }
-
 
   return (
     <UserLayout>
-        <DashBoardLayout>
-          {authState.user && userProfile.userId &&
-                      <div className={styles.container}>
-                              <div className={styles.backDropContainer}>
-                          
-                                  <label htmlFor='profilePictureUpload' className={styles.backDrop__overlay}>
-                                    <p>Edit</p>
-                                  </label>
+      <DashBoardLayout>
+        <div className={styles.container}>
+          <section className={styles.hero}>
+            <div className={styles.coverImage}>
+              <label
+                htmlFor="profilePictureUpload"
+                className={styles.photoUpload}
+              >
+                Change Photo
+              </label>
+              <input
+                type="file"
+                id="profilePictureUpload"
+                accept="image/*"
+                onChange={handleProfilePictureChange}
+              />
+              <img
+                src={`${baseURL}/${userProfile.userId.profilePicture || "default.jpg"}`}
+                alt={userProfile.userId.name || "Profile"}
+                className={styles.profilePhoto}
+              />
+            </div>
 
-                                  <input type='file' id='profilePictureUpload'/>
-                                <img
-                                  src={`${baseURL}/${userProfile.userId?.profilePicture || "default.jpg"}`}
-                                  alt="profile"
-                                  width={150}
-                                />
-                              </div>
-                       
-                            
-                    
-                              {/* All Profile Deatils */}
-                              <div className={styles.profileContainer_details}>
-                                <div style={{ display: "flex", gap: "0.7rem" }}>
-                                  <div style={{ flex: "0.8" }}>
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        width: "fit-content",
-                                        alignItems: "center",
-                                      }}
-                                    >
-                                      <h2>{userProfile.userId?.name}</h2>
-                                      <p style={{ color: "grey" }}>@{userProfile.userId?.username}</p>
-                                    </div>
-                    
-                                
-                    
-                                    <div>
-                                      <p>{userProfile.bio}</p>
-                                    </div>
-                                  </div>
-                    
-                                  <div style={{ flex: "0.2" }}>
-                                    <h3>Recent Activity </h3>
-                                    {userPosts.map((post)=>{
-                                      return <div key={post._id} className={styles.postCard}>
-                                
-                                        <div className={styles.card}>
-                                          <div className={styles.card_profileContainer}>
-                                           {post.media !==""? <img src={`${baseURL}/${post.media}`} alt=""/>
-                                           :<div style={{width:"3.4rem",height:"3.4rem"}}></div>     }
-                                          </div>
-                    
-                                          <p>{post.body}</p>
-                                        </div>
-                                      </div>
-                    
-                                    })}
-                                  </div>
-                    
-                    
-                    
-                                </div>
-                    
-                    
-                    
-                              </div>
-                              <button className={styles.addWorkButton} onClick={()=>{
-                                setIsModelOpen(true)
-                              }}>Add Work</button>
-                    
-                              <div className={styles.addWorkButton}>
-                                <h4>Work Experience </h4>
-                                <div className={styles.workHistoryContainer}>
-                                  {
-                                    (userProfile.pastwork || []).map((work,index)=>{
-                                      return(
-                                        <div key={index} className={styles.workHistoryCard}>
-                                          <p style={{fontWeight:"bold", display:"flex",alignItems:"center",gap:"0.8rem"}}>{work.company} - {work.position}</p>
-                                          <p>{work.years}</p>
-                                        </div>
-                                      )
-                                    })
-                                  }
-                                </div>
-                              </div>
-                    
-                    
-                    
-                            </div>
+            <div className={styles.identity}>
+              <div>
+                <h1>{userProfile.userId.name}</h1>
+                <p>@{userProfile.userId.username}</p>
+              </div>
+              <button
+                type="button"
+                className={styles.primaryButton}
+                disabled={isSaving}
+                onClick={() => saveProfile(userProfile)}
+              >
+                {isSaving ? "Saving..." : "Save Profile"}
+              </button>
+            </div>
+          </section>
 
-                            
-}
+          {statusMessage && (
+            <p className={styles.statusMessage}>{statusMessage}</p>
+          )}
 
-{isModelOpen && (
-  <div
-    className={styles.commentsContainer}
-    onClick={() => isModelOpen(false)}
-  >
-    <div>
-      <div
-        className={styles.allCommentsContainer}
-        onClick={(e) => e.stopPropagation()}
-      >
-  <input onChange={(e)=>handleWorkInputChange} name='company' className={styles.inputField} type="text" placeholder="Enter Work Place"/>
-  <input onChange={(e)=>handleWorkInputChange} name='position' className={styles.inputField} type="text" placeholder="Enter Company "/>
-  <input onChange={(e)=>handleWorkInputChange} name='years'  className={styles.inputField} type="text" placeholder="Years"/>
-  <div onClick={()=>{
-    setUserProfile({...userProfile})
-  }}  className={styles.updateProfilebtn}>Add Work </div>
-      </div>
-    </div>
-  </div>
-)}
-        </DashBoardLayout>
+          <div className={styles.profileGrid}>
+            <section className={styles.panel}>
+              <div className={styles.sectionHeader}>
+                <div>
+                  <p className={styles.eyebrow}>About</p>
+                  <h2>Profile Details</h2>
+                </div>
+              </div>
+
+              <label className={styles.field}>
+                Current role
+                <input
+                  name="currentPost"
+                  value={userProfile.currentPost || ""}
+                  onChange={handleProfileFieldChange}
+                  placeholder="Example: Frontend Developer"
+                />
+              </label>
+
+              <label className={styles.field}>
+                Bio
+                <textarea
+                  name="bio"
+                  value={userProfile.bio || ""}
+                  onChange={handleProfileFieldChange}
+                  placeholder="Write a short profile bio"
+                  rows={5}
+                />
+              </label>
+            </section>
+
+            <section className={styles.panel}>
+              <div className={styles.sectionHeader}>
+                <div>
+                  <p className={styles.eyebrow}>Activity</p>
+                  <h2>Recent Posts</h2>
+                </div>
+                <span>{userPosts.length}</span>
+              </div>
+
+              {userPosts.length === 0 ? (
+                <div className={styles.emptyState}>
+                  Your recent posts will appear here.
+                </div>
+              ) : (
+                <div className={styles.activityList}>
+                  {userPosts.slice(0, 4).map((post) => (
+                    <article key={post._id} className={styles.postCard}>
+                      {post.media ? (
+                        <img src={`${baseURL}/${post.media}`} alt="" />
+                      ) : (
+                        <div className={styles.postPlaceholder} />
+                      )}
+                      <p>{post.body || "Post without text"}</p>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          </div>
+
+          <section className={styles.panel}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <p className={styles.eyebrow}>Experience</p>
+                <h2>Work Experience</h2>
+              </div>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setIsWorkModalOpen(true)}
+              >
+                Add Work
+              </button>
+            </div>
+
+            {(userProfile.pastwork || []).length === 0 ? (
+              <div className={styles.emptyState}>No work experience added.</div>
+            ) : (
+              <div className={styles.cardGrid}>
+                {(userProfile.pastwork || []).map((work, index) => (
+                  <article key={`${work.company}-${index}`} className={styles.infoCard}>
+                    <div>
+                      <h3>{work.position || "Position"}</h3>
+                      <p>{work.company || "Company"}</p>
+                      <span>{work.years || "Years not added"}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveWork(index)}
+                      disabled={isSaving}
+                    >
+                      Remove
+                    </button>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+
+          <section className={styles.panel}>
+            <div className={styles.sectionHeader}>
+              <div>
+                <p className={styles.eyebrow}>Learning</p>
+                <h2>Education</h2>
+              </div>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setIsEducationModalOpen(true)}
+              >
+                Add Education
+              </button>
+            </div>
+
+            {(userProfile.education || []).length === 0 ? (
+              <div className={styles.emptyState}>No education added.</div>
+            ) : (
+              <div className={styles.cardGrid}>
+                {(userProfile.education || []).map((education, index) => (
+                  <article key={`${education.school}-${index}`} className={styles.infoCard}>
+                    <div>
+                      <h3>{education.degree || "Degree"}</h3>
+                      <p>{education.school || "School"}</p>
+                      <span>{education.feildofStudy || "Field of study"}</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveEducation(index)}
+                      disabled={isSaving}
+                    >
+                      Remove
+                    </button>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        {isWorkModalOpen && (
+          <div
+            className={styles.modalBackdrop}
+            onClick={() => setIsWorkModalOpen(false)}
+          >
+            <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
+              <h2>Add Work Experience</h2>
+              <input
+                className={styles.inputField}
+                name="company"
+                value={workInput.company}
+                onChange={(event) =>
+                  setWorkInput({ ...workInput, company: event.target.value })
+                }
+                placeholder="Company"
+              />
+              <input
+                className={styles.inputField}
+                name="position"
+                value={workInput.position}
+                onChange={(event) =>
+                  setWorkInput({ ...workInput, position: event.target.value })
+                }
+                placeholder="Position"
+              />
+              <input
+                className={styles.inputField}
+                name="years"
+                value={workInput.years}
+                onChange={(event) =>
+                  setWorkInput({ ...workInput, years: event.target.value })
+                }
+                placeholder="Years"
+              />
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.ghostButton}
+                  onClick={() => setIsWorkModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={handleAddWork}
+                  disabled={isSaving}
+                >
+                  Add Work
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {isEducationModalOpen && (
+          <div
+            className={styles.modalBackdrop}
+            onClick={() => setIsEducationModalOpen(false)}
+          >
+            <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
+              <h2>Add Education</h2>
+              <input
+                className={styles.inputField}
+                value={educationInput.school}
+                onChange={(event) =>
+                  setEducationInput({
+                    ...educationInput,
+                    school: event.target.value,
+                  })
+                }
+                placeholder="School"
+              />
+              <input
+                className={styles.inputField}
+                value={educationInput.degree}
+                onChange={(event) =>
+                  setEducationInput({
+                    ...educationInput,
+                    degree: event.target.value,
+                  })
+                }
+                placeholder="Degree"
+              />
+              <input
+                className={styles.inputField}
+                value={educationInput.feildofStudy}
+                onChange={(event) =>
+                  setEducationInput({
+                    ...educationInput,
+                    feildofStudy: event.target.value,
+                  })
+                }
+                placeholder="Field of study"
+              />
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.ghostButton}
+                  onClick={() => setIsEducationModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={handleAddEducation}
+                  disabled={isSaving}
+                >
+                  Add Education
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </DashBoardLayout>
     </UserLayout>
-  )
-
+  );
+}
