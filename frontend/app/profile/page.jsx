@@ -14,7 +14,13 @@ export default function ProfilePage() {
     const [userProfile,setUserProfile]= useState({})
     const [userPosts,setUserPost] =useState([])
     const postReducer =useSelector((state)=>state.postReducer)
-    const [isModelOpen, setIsModelOpen] = useState(true);
+    const [isModelOpen, setIsModelOpen] = useState(false);
+    const [inputData, setInputData] = useState({company:'', position:'', years:''})
+
+    const handleWorkInputChange = (e)=>{
+      const {name,value} = e.target;
+      setInputData({...inputData,[name]:value})
+    }
     // const [userProfile,setUserProfile] = useState({
     //     userId:{
     //         name:"",
@@ -127,9 +133,12 @@ export default function ProfilePage() {
                     
                     
                               </div>
+                              <button className={styles.addWorkButton} onClick={()=>{
+                                setIsModelOpen(true)
+                              }}>Add Work</button>
                     
-                              <div className="workHistory">
-                                <h4>Add Work</h4>
+                              <div className={styles.addWorkButton}>
+                                <h4>Work Experience </h4>
                                 <div className={styles.workHistoryContainer}>
                                   {
                                     (userProfile.pastwork || []).map((work,index)=>{
@@ -161,7 +170,12 @@ export default function ProfilePage() {
         className={styles.allCommentsContainer}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Comments here */}
+  <input onChange={(e)=>handleWorkInputChange} name='company' className={styles.inputField} type="text" placeholder="Enter Work Place"/>
+  <input onChange={(e)=>handleWorkInputChange} name='position' className={styles.inputField} type="text" placeholder="Enter Company "/>
+  <input onChange={(e)=>handleWorkInputChange} name='years'  className={styles.inputField} type="text" placeholder="Years"/>
+  <div onClick={()=>{
+    setUserProfile({...userProfile})
+  }}  className={styles.updateProfilebtn}>Add Work </div>
       </div>
     </div>
   </div>

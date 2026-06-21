@@ -137,7 +137,7 @@
 .commentsContainer{
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 5;
     background: rgba(0, 0, 0, 0.7);
     display: flex;
     align-items: center;
@@ -151,6 +151,19 @@
     border-radius: 10px;
     position: relative;
     padding: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
 }
+
+.inputField{
+     padding-inline: 1.3rem;
+    padding-block: 0.8rem;
+    outline: none;
+    border-radius: 10px;
+    border: 1px solid silver;
+    width: 100%;
+
+}   
 
 
