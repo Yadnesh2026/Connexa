@@ -122,6 +122,7 @@
 .singleOption__optionsContainer >svg{
     height: 100%;
     width: 8%;
+    min-width: 1rem;
 }
 
 .commentsContainer{
@@ -181,4 +182,13 @@
     text-align: center;
     color: white;
     cursor: pointer;
+}
+
+@media screen and (max-width:600px) {
+    .allCommentsContainer{
+        width: 90%;
+        
+
+    }
+    
 }

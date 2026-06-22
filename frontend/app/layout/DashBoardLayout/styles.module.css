@@ -61,3 +61,34 @@ transform: scale(1.04);
 .HomeContainer_feedConatiner{
     padding-inline: 0.8rem;
 }
+
+@media only screen and (max-width:600px){
+    .HomeConatiner_extraContainer{
+        display:none;
+    }
+    .homeConatiner{
+        display: block;
+    }
+
+    .homeConatiner_leftBar{
+        display: none;
+    }
+}
+
+
+.mobileNavbar{
+    position:absolute;
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    height: 6vh;
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    align-items: center;
+}
+
+.singleNavItemHolder_mobileView{
+    height: 2rem;
+    width: 2rem;
+}
