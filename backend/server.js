@@ -21,30 +21,40 @@ app.use(express.json()); //for json format - keep always above the routes
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.get("/", (req, res) => {
-  res.status(200).json({ message: "Connexa API is running" });
+  res.status(200).json({
+    message: "Connexa API is running",
+    mongoConnected: mongoose.connection.readyState === 1,
+  });
 });
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ message: "ok" });
+  res.status(200).json({
+    message: "ok",
+    mongoConnected: mongoose.connection.readyState === 1,
+  });
 });
 
 //Use Routes
 app.use(postRoutes)
 app.use(userRoutes)
 
-const start = async () => {
+const connectDB = async () => {
+  if (!process.env.MONGO_URL) {
+    console.error("MONGO_URL is missing. Add it in Render environment variables.");
+    return;
+  }
+
   try {
-    const connectDB = await mongoose.connect(process.env.MONGO_URL);
+    await mongoose.connect(process.env.MONGO_URL);
     console.log("Mongo is connected");
-
-    const port = process.env.PORT || 9090;
-
-    app.listen(port, () => {
-      console.log(`server is running on ${port}`);
-    });
   } catch (err) {
-    console.log(err);
+    console.error("Mongo connection failed:", err.message);
   }
 };
 
-start();
+const port = process.env.PORT || 9090;
+
+app.listen(port, () => {
+  console.log(`server is running on ${port}`);
+  connectDB();
+});
