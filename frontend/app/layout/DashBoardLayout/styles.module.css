@@ -1,13 +1,8 @@
 .homeConatiner{
-    display: flex; 
+    display: grid;
+    grid-template-columns: minmax(11rem, 0.22fr) minmax(0, 0.58fr) minmax(11rem, 0.2fr);
+    min-height: calc(100svh - 5rem);
 }
-
-.homeConatiner > div:nth-child(odd){
-    flex: 0.2;
-}
-.homeConatiner > div:nth-child(even){
-    flex: 0.6;
-} 
 
 .homeContainerLeftBar{
     display: flex;
@@ -56,41 +51,69 @@ transform: scale(1.04);
 .HomeConatiner_extraContainer{
     border-left: 1px solid rgb(225, 220, 220);
     padding-left: 1.2rem;
+    padding-right: 0.8rem;
 
 }
 .HomeContainer_feedConatiner{
     padding-inline: 0.8rem;
+    min-width: 0;
+    width: 100%;
 }
-
-@media only screen and (max-width:600px){
-    .HomeConatiner_extraContainer{
-        display:none;
-    }
-    .homeConatiner{
-        display: block;
-    }
-
-    .homeConatiner_leftBar{
-        display: none;
-    }
-}
-
 
 .mobileNavbar{
-    position:absolute;
+    position:fixed;
     bottom: 0;
     left: 0;
     width: 100vw;
-    height: 6vh;
-    display: flex;
+    height: 4.2rem;
+    display: none;
     justify-content: space-around;
     background: white;
     align-items: center;
+    border-top: 1px solid #e5e5e5;
+    z-index: 50;
 }
 
 .singleNavItemHolder_mobileView{
-    height: 2rem;
-    width: 2rem;
+    height: 2.2rem;
+    width: 2.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+
+
+
+@media only screen and (max-width:900px){
+    .homeConatiner{
+        grid-template-columns: minmax(9rem, 0.24fr) minmax(0, 0.76fr);
+    }
+
+    .HomeConatiner_extraContainer{
+        display:none;
+    }
+}
+
+@media only screen and (max-width:600px){
+    .homeConatiner{
+        display: block;
+        min-height: auto;
+    }
+
+    .homeContainerLeftBar{
+        display: none;
+    }
+
+    .HomeContainer_feedConatiner{
+        padding-inline: 0.65rem;
+        padding-bottom: 5.2rem;
+    }
+
+    .mobileNavbar{
+        display: flex;
+    }
 }
 
 

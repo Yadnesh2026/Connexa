@@ -129,7 +129,9 @@ export default function DashBoardLayout({ children }) {
       </div>
 
       <div className={styles.mobileNavbar}>
-        <div className={styles.singleNavItemHolder_mobileView}>
+        <div onClick={() => {
+                router.push("/dashboard");
+              }} className={styles.singleNavItemHolder_mobileView}>
           <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -147,7 +149,9 @@ export default function DashBoardLayout({ children }) {
 
           </div>
 
-          <div className={styles.singleNavItemHolder_mobileView}>
+          <div  onClick={() => {
+                router.push("/discover");
+              }} className={styles.singleNavItemHolder_mobileView}>
                <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -164,7 +168,9 @@ export default function DashBoardLayout({ children }) {
               </svg>
           </div>
 
-          <div className={styles.singleNavItemHolder_mobileView}>
+          <div onClick={() => {
+                router.push("/my_connections");
+              }}  className={styles.singleNavItemHolder_mobileView}>
                <svg
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
