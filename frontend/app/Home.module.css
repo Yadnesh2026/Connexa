@@ -9,7 +9,7 @@
     align-items: center;
     gap: 4rem;
     padding-inline: 2rem;
-    height: 80vh;
+    min-height: 80vh;
 }
 
 .mainContainerRight {
@@ -58,3 +58,46 @@
     border-radius: 20px;
 }
 
+
+@media only screen and (max-width: 800px){
+    .container{
+        padding: 1rem;
+    }
+
+    .mainContainer{
+        min-height: auto;
+        flex-direction: column;
+        gap: 2rem;
+        padding: 2rem 0.5rem;
+        text-align: center;
+    }
+
+    .mainContainerLeft,
+    .mainContainerRight{
+        flex: none;
+        width: 100%;
+    }
+
+    .mainContainerLeft > p:nth-child(1){
+        font-size: 2.2rem;
+    }
+
+    .mainContainerLeft > p:nth-child(2){
+        font-size: 1.2rem;
+    }
+
+    .mainContainerLeft > div.buttonJoin{
+        margin-inline: auto;
+        font-size: 1rem;
+    }
+}
+
+@media only screen and (max-width: 420px){
+    .mainContainerLeft > p:nth-child(1){
+        font-size: 1.85rem;
+    }
+
+    .mainContainer{
+        padding-inline: 0;
+    }
+}

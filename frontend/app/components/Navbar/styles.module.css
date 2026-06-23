@@ -51,3 +51,34 @@
     font-weight: bold;
     cursor: pointer;
 }
+
+@media only screen and (max-width: 600px){
+    .container{
+        padding: 0.85rem;
+    }
+
+    .navbar h1{
+        font-size: 1.55rem;
+    }
+
+    .signedInControls{
+        gap: 0.55rem;
+    }
+
+    .signedInControls > p{
+        max-width: 7.5rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        font-size: 0.9rem;
+    }
+
+    .iconButton{
+        width: 2.2rem;
+        height: 2.2rem;
+    }
+
+    .buttonJoin{
+        padding-inline: 0.85rem;
+    }
+}

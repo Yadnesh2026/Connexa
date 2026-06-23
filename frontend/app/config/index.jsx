@@ -6,7 +6,7 @@
 import axios from "axios";
 //Single Instance to change the server coming from backend
 
-export const baseURL = "http://localhost:9090/"
+export const baseURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:9090/"
 export const clientServer = axios.create({
     baseURL:baseURL,
 })

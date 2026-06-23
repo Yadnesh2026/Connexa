@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { setTokenisThere } from "../../config/redux/reducer/authReducer";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../../config/redux/action/authAction";
+import { baseURL } from "../../config";
 
 
 
@@ -118,7 +119,7 @@ export default function DashBoardLayout({ children }) {
                 const profilePicture = user?.profilePicture || "default.jpg";
                 return(
                     <div key={Profile._id} className={styles.extraContainer__profile}>
-                        <img src={`http://localhost:9090/${profilePicture}`} alt={user?.name || "Profile"}/>
+                        <img src={`${baseURL}/${profilePicture}`} alt={user?.name || "Profile"}/>
                         <p>{user?.name}</p>
 
                     </div>

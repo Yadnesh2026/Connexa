@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: connexa-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: MONGO_URL
+        sync: false
+      - key: CLIENT_URL
+        sync: false

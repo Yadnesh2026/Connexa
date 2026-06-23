@@ -9,7 +9,10 @@ dotenv.config();
 
 const app = express();
 
-app.use(cors()); //for frontend backend interaction
+app.use(cors({
+  origin: process.env.CLIENT_URL || true,
+  credentials: true,
+})); //for frontend backend interaction
 app.use(express.json()); //for json format - keep always above the routes
 
 //Use Routes
@@ -22,8 +25,10 @@ const start = async () => {
     const connectDB = await mongoose.connect(process.env.MONGO_URL);
     console.log("Mongo is connected");
 
-    app.listen(9090, () => {
-      console.log("server is running on 9090");
+    const port = process.env.PORT || 9090;
+
+    app.listen(port, () => {
+      console.log(`server is running on ${port}`);
     });
   } catch (err) {
     console.log(err);
