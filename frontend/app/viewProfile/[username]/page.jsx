@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import UserLayout from "../../layout/UserLayout/page";
 import DashBoardLayout from "../../layout/DashBoardLayout/Page";
-import { clientServer, baseURL } from "../../config";
+import { clientServer, getMediaUrl, handleImageError } from "../../config";
 import styles from "../styles.module.css";
 import {getAllPosts} from "../../config/redux/action/postAction"
 import {getConnectionReq,getMyConnectionRequests,sendConnectionRequest} from "../../config/redux/action/authAction"
@@ -121,7 +121,8 @@ useEffect(() => {
           <div className={styles.backDropContainer}>
             <img
               className={styles.backDrop}
-              src={`${baseURL}/${userProfile.userId?.profilePicture || "default.jpg"}`}
+              src={getMediaUrl(userProfile.userId?.profilePicture)}
+              onError={handleImageError}
               alt="profile"
               width={150}
             />
@@ -175,7 +176,7 @@ useEffect(() => {
                           return;
                         }
 
-                        window.open(`${baseURL}${outputPath}`, "_blank");
+                        window.open(getMediaUrl(outputPath, ""), "_blank");
                       } catch (err) {
                         alert(err.response?.data?.message || "Resume could not be generated.");
                       }
@@ -199,7 +200,15 @@ useEffect(() => {
             
                     <div className={styles.card}>
                       <div className={styles.card_profileContainer}>
-                       {post.media !==""? <img src={`${baseURL}/${post.media}`} alt=""/>
+                       {post.media !==""? (
+                        <img
+                          src={getMediaUrl(post.media, "")}
+                          alt=""
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
+                       )
                        :<div style={{width:"3.4rem",height:"3.4rem"}}></div>     }
                       </div>
 

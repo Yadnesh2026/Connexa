@@ -5,7 +5,7 @@ import UserLayout from "../layout/UserLayout/page";
 import DashBoardLayout from "../layout/DashBoardLayout/Page";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles.module.css";
-import { baseURL } from "../config";
+import { getMediaUrl, handleImageError } from "../config";
 import { useRouter } from "next/navigation";
 import { AcceptConnection, getMyConnectionRequests } from "../config/redux/action/authAction";
 
@@ -83,7 +83,8 @@ export default function MyConnectionsPage() {
                     >
                       <div className={styles.profilePicture}>
                         <img
-                          src={`${baseURL}/${user?.profilePicture || "default.jpg"}`}
+                          src={getMediaUrl(user?.profilePicture)}
+                          onError={handleImageError}
                           alt={user?.name || "Profile"}
                         />
                       </div>
@@ -140,7 +141,8 @@ export default function MyConnectionsPage() {
                     >
                       <div className={styles.profilePicture}>
                         <img
-                          src={`${baseURL}/${user?.profilePicture || "default.jpg"}`}
+                          src={getMediaUrl(user?.profilePicture)}
+                          onError={handleImageError}
                           alt={user?.name || "Profile"}
                         />
                       </div>

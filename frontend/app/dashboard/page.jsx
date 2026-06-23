@@ -16,7 +16,7 @@ import {
 import DashBoardLayout from "../layout/DashBoardLayout/Page.jsx";
 import { getAllUsers } from "../config/redux/action/authAction";
 import styles from "./styles.module.css";
-import { baseURL } from "../config/index.jsx";
+import { getMediaUrl, handleImageError } from "../config/index.jsx";
 import { resetPostId, setPostId } from "../config/redux/reducer/postReducer";
 // import {getAllPost} from "../../../backend/controllers/post.controller.js"
 
@@ -72,7 +72,9 @@ export default function Dashboard() {
             <div className={styles.createPostContainer}>
               <img
                 className={styles.userProfile}
-                src={`${baseURL}/${authState.user?.userId?.profilePicture}`}
+                src={getMediaUrl(authState.user?.userId?.profilePicture)}
+                onError={handleImageError}
+                alt={authState.user?.userId?.name || "Profile"}
               />
 
               <textarea
@@ -123,7 +125,9 @@ export default function Dashboard() {
                     <div className={styles.singleCard_profileContainer}>
                       <img
                         className={styles.userProfile}
-                        src={`${baseURL}/${post.userId?.profilePicture || "default.jpg"}`}
+                        src={getMediaUrl(post.userId?.profilePicture)}
+                        onError={handleImageError}
+                        alt={post.userId?.name || "Profile"}
                       />
                       <div>
                         <div
@@ -172,9 +176,17 @@ export default function Dashboard() {
                         </p>
                         <p style={{ paddingTop: "1.3rem" }}>{post.body}</p>
 
-                        <div className="singleCard__image">
-                          <img src={`${baseURL}/${post.media}`} />
-                        </div>
+                        {post.media && (
+                          <div className="singleCard__image">
+                            <img
+                              src={getMediaUrl(post.media, "")}
+                              alt=""
+                              onError={(event) => {
+                                event.currentTarget.style.display = "none";
+                              }}
+                            />
+                          </div>
+                        )}
 
                         <div className={styles.optionsContainer}>
                           {/* Likes */}
@@ -296,7 +308,8 @@ export default function Dashboard() {
                       >
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
                           <img
-                            src={`${baseURL}/${comment.userId?.profilePicture || 'default.jpg'}`}
+                            src={getMediaUrl(comment.userId?.profilePicture)}
+                            onError={handleImageError}
                             alt=""
                             style={{ width: '38px', height: '38px', borderRadius: '50%', objectFit: 'cover' }}
                           />

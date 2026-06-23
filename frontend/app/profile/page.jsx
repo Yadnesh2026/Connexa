@@ -6,7 +6,7 @@ import DashBoardLayout from "../layout/DashBoardLayout/Page";
 import { useDispatch, useSelector } from "react-redux";
 import { getAboutUser } from "../config/redux/action/authAction";
 import { getAllPosts } from "../config/redux/action/postAction";
-import { baseURL, clientServer } from "../config";
+import { clientServer, getMediaUrl, handleImageError } from "../config";
 import styles from "./styles.module.css";
 
 const emptyWork = { company: "", position: "", years: "" };
@@ -201,7 +201,8 @@ export default function ProfilePage() {
                 onChange={handleProfilePictureChange}
               />
               <img
-                src={`${baseURL}/${userProfile.userId.profilePicture || "default.jpg"}`}
+                src={getMediaUrl(userProfile.userId.profilePicture)}
+                onError={handleImageError}
                 alt={userProfile.userId.name || "Profile"}
                 className={styles.profilePhoto}
               />
@@ -276,7 +277,13 @@ export default function ProfilePage() {
                   {userPosts.slice(0, 4).map((post) => (
                     <article key={post._id} className={styles.postCard}>
                       {post.media ? (
-                        <img src={`${baseURL}/${post.media}`} alt="" />
+                        <img
+                          src={getMediaUrl(post.media, "")}
+                          alt=""
+                          onError={(event) => {
+                            event.currentTarget.style.display = "none";
+                          }}
+                        />
                       ) : (
                         <div className={styles.postPlaceholder} />
                       )}

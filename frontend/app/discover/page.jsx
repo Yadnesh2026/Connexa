@@ -5,7 +5,7 @@ import UserLayout from "../layout/UserLayout/page";
 import DashBoardLayout from "../layout/DashBoardLayout/Page";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllUsers } from "../config/redux/action/authAction";
-import { baseURL } from "../config";
+import { getMediaUrl, handleImageError } from "../config";
 import styles from "./styles.module.css"
 import { useRouter } from "next/navigation";
 
@@ -33,7 +33,12 @@ export default function DiscoverPage() {
                 <div onClick={()=>{
                   router.push(`/viewProfile/${user.userId.username}`)
                 }} key={user._id} className={styles.userCard}>
-                  <img className={styles.userCard_image} src={`${baseURL}/${user.userId.profilePicture || "default.jpg"}`} alt="profile"/>
+                  <img
+                    className={styles.userCard_image}
+                    src={getMediaUrl(user.userId.profilePicture)}
+                    onError={handleImageError}
+                    alt="profile"
+                  />
                   <div>
                      <h1>{user.userId.name}</h1>
                      <p>{user.userId.username}</p>
