@@ -94,6 +94,13 @@
   color: #6b7280;
 }
 
+.profileActions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+}
+
 .profileGrid {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(18rem, 0.7fr);
@@ -175,6 +182,7 @@
 }
 
 .primaryButton,
+.uploadButton,
 .secondaryButton,
 .ghostButton,
 .infoCard button {
@@ -192,6 +200,16 @@
 
 .primaryButton:hover {
   background: #0b5a9d;
+}
+
+.uploadButton {
+  padding: 0.72rem 1rem;
+  background: #eef2ff;
+  color: #1e3a8a;
+}
+
+.uploadButton:hover {
+  background: #dbeafe;
 }
 
 .primaryButton:disabled,

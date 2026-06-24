@@ -161,6 +161,10 @@ export const uploadProfilePicture = async (req, res) => {
   const { token } = req.body;
 
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: "Please upload an image file" });
+    }
+
     const user = await User.findOne({ token: token });
 
     if (!user) {
@@ -170,7 +174,10 @@ export const uploadProfilePicture = async (req, res) => {
     user.profilePicture = req.file.filename;
     await user.save();
 
-    return res.status(200).json({ message: "Profile Picture Updated" });
+    return res.status(200).json({
+      message: "Profile Picture Updated",
+      profilePicture: user.profilePicture,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

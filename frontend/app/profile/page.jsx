@@ -24,6 +24,7 @@ export default function ProfilePage() {
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
+  const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -32,6 +33,14 @@ export default function ProfilePage() {
     }
     dispatch(getAllPosts());
   }, [dispatch]);
+
+  useEffect(() => {
+    return () => {
+      if (photoPreviewUrl) {
+        URL.revokeObjectURL(photoPreviewUrl);
+      }
+    };
+  }, [photoPreviewUrl]);
 
   const userProfile = useMemo(() => {
     if (!authState.user?.userId) return null;
@@ -96,9 +105,30 @@ export default function ProfilePage() {
 
     if (!file || !token) return;
 
+    if (!file.type.startsWith("image/")) {
+      setStatusMessage("Please choose an image file.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setStatusMessage("Profile photo must be 5 MB or smaller.");
+      event.target.value = "";
+      return;
+    }
+
     const formData = new FormData();
     formData.append("token", token);
     formData.append("profile", file);
+
+    const previewUrl = URL.createObjectURL(file);
+    setPhotoPreviewUrl((currentPreview) => {
+      if (currentPreview) {
+        URL.revokeObjectURL(currentPreview);
+      }
+
+      return previewUrl;
+    });
 
     setIsSaving(true);
     setStatusMessage("");
@@ -107,6 +137,7 @@ export default function ProfilePage() {
       await clientServer.post("/upload_profile", formData);
       await dispatch(getAboutUser({ token }));
       setStatusMessage("Profile photo updated.");
+      setPhotoPreviewUrl("");
     } catch (err) {
       setStatusMessage(
         err.response?.data?.message || "Profile photo could not be uploaded.",
@@ -204,7 +235,7 @@ export default function ProfilePage() {
                 onChange={handleProfilePictureChange}
               />
               <img
-                src={getMediaUrl(userProfile.userId.profilePicture)}
+                src={photoPreviewUrl || getMediaUrl(userProfile.userId.profilePicture)}
                 onError={handleImageError}
                 alt={userProfile.userId.name || "Profile"}
                 className={styles.profilePhoto}
@@ -216,14 +247,22 @@ export default function ProfilePage() {
                 <h1>{userProfile.userId.name}</h1>
                 <p>@{userProfile.userId.username}</p>
               </div>
-              <button
-                type="button"
-                className={styles.primaryButton}
-                disabled={isSaving}
-                onClick={() => saveProfile(userProfile)}
-              >
-                {isSaving ? "Saving..." : "Save Profile"}
-              </button>
+              <div className={styles.profileActions}>
+                <label
+                  htmlFor="profilePictureUpload"
+                  className={styles.uploadButton}
+                >
+                  Upload Photo
+                </label>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  disabled={isSaving}
+                  onClick={() => saveProfile(userProfile)}
+                >
+                  {isSaving ? "Saving..." : "Save Profile"}
+                </button>
+              </div>
             </div>
           </section>
 

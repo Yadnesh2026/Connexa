@@ -15,20 +15,42 @@ import {
   getUserProfileAndUserBasedOnUsername
 } from "../controllers/user.controller.js";
 import multer from "multer"; //Used to file upload from frontend to backend
+import crypto from "crypto";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const router = Router();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsDir = path.join(__dirname, "../uploads");
 
 //Store the Image
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/");
+    fs.mkdirSync(uploadsDir, { recursive: true });
+    cb(null, uploadsDir);
   },
   filename: (req, file, cb) => {
-    cb(null, file.originalname);
+    const extension = path.extname(file.originalname || "").toLowerCase();
+    cb(null, `${crypto.randomUUID()}${extension}`);
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image/")) {
+      cb(new Error("Only image files are allowed"));
+      return;
+    }
+
+    cb(null, true);
+  },
+});
 
 router.route("/upload_profile") //Path to where file is gonna store
   .post(upload.single("profile"), uploadProfilePicture);//Take one uploaded file whose field name is profile
