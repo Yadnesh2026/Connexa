@@ -7,7 +7,7 @@ import axios from "axios";
 //Single Instance to change the server coming from backend
 
 export const baseURL = (
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:9090"
+  process.env.NEXT_PUBLIC_API_URL || "https://connexa-backend-4yg5.onrender.com"
 ).replace(/\/+$/, "");
 
 export const getMediaUrl = (fileName, fallback = "default.jpg") => {
