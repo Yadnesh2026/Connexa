@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "next/navigation";
 import UserLayout from "../../layout/UserLayout/page";
@@ -17,9 +17,7 @@ export default function ViewProfilePage() {
   const authState = useSelector((state) => state.auth);
 
   const [userProfile, setUserProfile] = useState(null);
-  const [userPosts, setUserPosts] = useState([]);
-  const [isCurrentInConnection, setIsCurrentInConnection] = useState(false);
-  const [isConnectionNull, setIsConnectionNull] =useState(true);
+  const [connectionOverride, setConnectionOverride] = useState(null);
   const [profileError, setProfileError] = useState("");
 
   
@@ -48,30 +46,19 @@ export default function ViewProfilePage() {
     if (username) fetchProfile();
   }, [username]);
 
+  const userPosts = useMemo(() => {
+    if (!postReducer.posts) return [];
 
-
-
-  const getUserPost = async () => {
-    await dispatch(getAllPosts());
-    await dispatch(getConnectionReq({ token: localStorage.getItem("token") }));
-    await dispatch(getMyConnectionRequests({token:localStorage.getItem("token")}))
-
-  };
-
-useEffect(() => {
-  if (!postReducer?.posts) return;
-  const posts = postReducer.posts.filter((post) => {
+    return postReducer.posts.filter((post) => {
     return post.userId?.username === username;
   });
-  setUserPosts(posts);
-}, [postReducer?.posts, username]);
+}, [postReducer.posts, username]);
 
 
 
 
-  useEffect(() => {
-
-    if (!userProfile) return;
+  const existingConnection = useMemo(() => {
+    if (!userProfile) return null;
 
     const profileUserId = userProfile.userId._id;
     const sentRequests = Array.isArray(authState.connections) ? authState.connections : [];
@@ -79,26 +66,26 @@ useEffect(() => {
       ? authState.connectionRequest
       : [];
 
-    const existingConnection = [...sentRequests, ...receivedOrAcceptedRequests].find((connection) => {
+    return [...sentRequests, ...receivedOrAcceptedRequests].find((connection) => {
       return (
         connection.userId?._id === profileUserId ||
         connection.connectionId?._id === profileUserId
       );
     });
-
-    setIsCurrentInConnection(Boolean(existingConnection));
-    setIsConnectionNull(existingConnection?.status_accepted !== true);
-
   }, [authState.connections, userProfile, authState.connectionRequest]);
 
-
-
-
+  const activeConnection = connectionOverride || existingConnection;
+  const isCurrentInConnection = Boolean(activeConnection);
+  const isConnectionNull = activeConnection?.status_accepted !== true;
 
 
   useEffect(() => {
-    getUserPost()
-  }, []);
+    const token = localStorage.getItem("token");
+
+    dispatch(getAllPosts());
+    dispatch(getConnectionReq({ token }));
+    dispatch(getMyConnectionRequests({ token }));
+  }, [dispatch]);
 
   if (profileError) {
     return (
@@ -155,8 +142,7 @@ useEffect(() => {
                               user: userProfile.userId,
                             })
                           );
-                          setIsCurrentInConnection(true);
-                          setIsConnectionNull(true);
+                          setConnectionOverride({ status_accepted: null });
                           dispatch(getConnectionReq({ token: localStorage.getItem("token") }));
                           dispatch(getMyConnectionRequests({token:localStorage.getItem("token")}));
                         }}

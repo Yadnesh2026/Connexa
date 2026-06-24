@@ -17,7 +17,7 @@ export default function ProfilePage() {
   const authState = useSelector((state) => state.auth);
   const postReducer = useSelector((state) => state.posts);
 
-  const [userProfile, setUserProfile] = useState(null);
+  const [profileEdits, setProfileEdits] = useState({});
   const [workInput, setWorkInput] = useState(emptyWork);
   const [educationInput, setEducationInput] = useState(emptyEducation);
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
@@ -33,11 +33,14 @@ export default function ProfilePage() {
     dispatch(getAllPosts());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (authState.user?.userId) {
-      setUserProfile(authState.user);
-    }
-  }, [authState.user]);
+  const userProfile = useMemo(() => {
+    if (!authState.user?.userId) return null;
+
+    return {
+      ...authState.user,
+      ...profileEdits,
+    };
+  }, [authState.user, profileEdits]);
 
   const userPosts = useMemo(() => {
     const username = userProfile?.userId?.username;
@@ -68,7 +71,7 @@ export default function ProfilePage() {
         education: nextProfile.education || [],
       });
 
-      setUserProfile(nextProfile);
+      setProfileEdits({});
       await dispatch(getAboutUser({ token }));
       setStatusMessage(successText || "Profile updated successfully.");
       return true;
@@ -84,7 +87,7 @@ export default function ProfilePage() {
 
   const handleProfileFieldChange = (event) => {
     const { name, value } = event.target;
-    setUserProfile((current) => ({ ...current, [name]: value }));
+    setProfileEdits((current) => ({ ...current, [name]: value }));
   };
 
   const handleProfilePictureChange = async (event) => {

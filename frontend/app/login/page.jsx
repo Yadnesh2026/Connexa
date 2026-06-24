@@ -113,7 +113,7 @@ const handleLogin =()=>{
 
           <div className={styles.cardContainerRight}>
             
-              {userLogin ?<p>Don't have an Account?</p> :<p>Already have an Account</p>}
+              {userLogin ?<p>Don&apos;t have an Account?</p> :<p>Already have an Account</p>}
                  <div onClick={()=>{
                   setUserLogin(!userLogin)
                 }} style={{color:"black",textAlign:"center"}} className={styles.buttonWithOutline}>
