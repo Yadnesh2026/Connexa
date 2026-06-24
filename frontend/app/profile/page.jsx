@@ -58,13 +58,13 @@ export default function ProfilePage() {
   }, [authState.user, profileEdits]);
 
   const userPosts = useMemo(() => {
-    const username = userProfile?.userId?.username;
+    const username = userProfile ? userProfile.userId?.username : "";
     if (!username) return [];
 
     return (postReducer.posts || []).filter(
       (post) => post.userId?.username === username,
     );
-  }, [postReducer.posts, userProfile?.userId?.username]);
+  }, [postReducer.posts, userProfile]);
 
   const saveProfile = async (nextProfile, successText) => {
     const token = localStorage.getItem("token");

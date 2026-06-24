@@ -117,7 +117,7 @@
   color: #111827;
   cursor: pointer;
   font-weight: 800;
-  opacity: 0;
+  opacity: 1;
   box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
   transition: opacity 0.18s ease, transform 0.18s ease;
 }
@@ -125,7 +125,7 @@
 .hero:hover .editProfileButton,
 .editProfileButton:focus-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(-1px);
 }
 
 .profileGrid {
