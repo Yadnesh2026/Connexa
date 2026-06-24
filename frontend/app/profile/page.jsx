@@ -20,6 +20,12 @@ export default function ProfilePage() {
   const [profileEdits, setProfileEdits] = useState({});
   const [workInput, setWorkInput] = useState(emptyWork);
   const [educationInput, setEducationInput] = useState(emptyEducation);
+  const [userInput, setUserInput] = useState({
+    name: "",
+    username: "",
+    email: "",
+  });
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isWorkModalOpen, setIsWorkModalOpen] = useState(false);
   const [isEducationModalOpen, setIsEducationModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -97,6 +103,56 @@ export default function ProfilePage() {
   const handleProfileFieldChange = (event) => {
     const { name, value } = event.target;
     setProfileEdits((current) => ({ ...current, [name]: value }));
+  };
+
+  const openProfileEditor = () => {
+    setUserInput({
+      name: userProfile.userId?.name || "",
+      username: userProfile.userId?.username || "",
+      email: userProfile.userId?.email || "",
+    });
+    setIsProfileModalOpen(true);
+  };
+
+  const handleUserInputChange = (event) => {
+    const { name, value } = event.target;
+    setUserInput((current) => ({ ...current, [name]: value }));
+  };
+
+  const saveUserDetails = async () => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setStatusMessage("Please sign in again to update your profile.");
+      return;
+    }
+
+    if (!userInput.name.trim() || !userInput.username.trim() || !userInput.email.trim()) {
+      setStatusMessage("Name, username, and email are required.");
+      return;
+    }
+
+    setIsSaving(true);
+    setStatusMessage("");
+
+    try {
+      await clientServer.post("/user_update", {
+        token,
+        name: userInput.name.trim(),
+        username: userInput.username.trim(),
+        email: userInput.email.trim(),
+      });
+
+      await dispatch(getAboutUser({ token }));
+      setIsProfileModalOpen(false);
+      setStatusMessage("Profile details updated.");
+    } catch (err) {
+      setStatusMessage(
+        err.response?.data?.message || "Profile details could not be updated.",
+      );
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleProfilePictureChange = async (event) => {
@@ -221,6 +277,13 @@ export default function ProfilePage() {
       <DashBoardLayout>
         <div className={styles.container}>
           <section className={styles.hero}>
+            <button
+              type="button"
+              className={styles.editProfileButton}
+              onClick={openProfileEditor}
+            >
+              Edit Profile
+            </button>
             <div className={styles.coverImage}>
               <label
                 htmlFor="profilePictureUpload"
@@ -415,6 +478,56 @@ export default function ProfilePage() {
             )}
           </section>
         </div>
+
+        {isProfileModalOpen && (
+          <div
+            className={styles.modalBackdrop}
+            onClick={() => setIsProfileModalOpen(false)}
+          >
+            <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
+              <h2>Edit Profile</h2>
+              <input
+                className={styles.inputField}
+                name="name"
+                value={userInput.name}
+                onChange={handleUserInputChange}
+                placeholder="Name"
+              />
+              <input
+                className={styles.inputField}
+                name="username"
+                value={userInput.username}
+                onChange={handleUserInputChange}
+                placeholder="Username"
+              />
+              <input
+                className={styles.inputField}
+                name="email"
+                type="email"
+                value={userInput.email}
+                onChange={handleUserInputChange}
+                placeholder="Email"
+              />
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.ghostButton}
+                  onClick={() => setIsProfileModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  className={styles.primaryButton}
+                  onClick={saveUserDetails}
+                  disabled={isSaving}
+                >
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {isWorkModalOpen && (
           <div

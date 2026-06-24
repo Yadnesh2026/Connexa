@@ -17,6 +17,10 @@
   background: #fff;
 }
 
+.hero {
+  position: relative;
+}
+
 .coverImage {
   height: 15rem;
   position: relative;
@@ -99,6 +103,29 @@
   align-items: center;
   gap: 0.7rem;
   flex-wrap: wrap;
+}
+
+.editProfileButton {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  z-index: 3;
+  padding: 0.58rem 0.85rem;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #111827;
+  cursor: pointer;
+  font-weight: 800;
+  opacity: 0;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.16);
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.hero:hover .editProfileButton,
+.editProfileButton:focus-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .profileGrid {
