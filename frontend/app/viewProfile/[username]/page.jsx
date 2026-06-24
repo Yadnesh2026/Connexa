@@ -8,7 +8,7 @@ import DashBoardLayout from "../../layout/DashBoardLayout/Page";
 import { clientServer, getMediaUrl, handleImageError } from "../../config";
 import styles from "../styles.module.css";
 import {getAllPosts} from "../../config/redux/action/postAction"
-import {getAboutUser,getConnectionReq,getMyConnectionRequests,sendConnectionRequest} from "../../config/redux/action/authAction"
+import {getAboutUser,getAllUsers,getConnectionReq,getMyConnectionRequests,sendConnectionRequest} from "../../config/redux/action/authAction"
 
 export default function ViewProfilePage() {
   const { username } = useParams();           // <-- replaces "await params"
@@ -136,6 +136,7 @@ export default function ViewProfilePage() {
       await clientServer.post("/upload_profile", formData);
       await refreshProfile();
       await dispatch(getAboutUser({ token }));
+      await dispatch(getAllUsers());
       setStatusMessage("Profile photo updated.");
       setPhotoPreviewUrl("");
     } catch (err) {

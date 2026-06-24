@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import UserLayout from "../layout/UserLayout/page";
 import DashBoardLayout from "../layout/DashBoardLayout/Page";
 import { useDispatch, useSelector } from "react-redux";
-import { getAboutUser } from "../config/redux/action/authAction";
+import { getAboutUser, getAllUsers } from "../config/redux/action/authAction";
 import { getAllPosts } from "../config/redux/action/postAction";
 import { clientServer, getMediaUrl, handleImageError } from "../config";
 import styles from "./styles.module.css";
@@ -192,6 +192,7 @@ export default function ProfilePage() {
     try {
       await clientServer.post("/upload_profile", formData);
       await dispatch(getAboutUser({ token }));
+      await dispatch(getAllUsers());
       setStatusMessage("Profile photo updated.");
       setPhotoPreviewUrl("");
     } catch (err) {
