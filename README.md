@@ -8,7 +8,7 @@ Connexa is a full-stack professional networking platform inspired by LinkedIn, b
 https://connexa-woad.vercel.app/
 
 **Backend API (Render):**
-[https://your-render-backend-url.onrender.com](https://connexa-backend-4yg5.onrender.com)
+[https://connexa-backend-4yg5.onrender.com](https://connexa-backend-4yg5.onrender.com)
 
 ---
 
