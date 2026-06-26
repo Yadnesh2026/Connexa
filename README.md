@@ -1,105 +1,170 @@
-# Connexa - An Social Media Application
+# 🚀 Connexa - Professional Networking Platform
 
-A Node.js and Express.js backend for Connexa, a professional networking platform inspired by LinkedIn...
+Connexa is a full-stack professional networking platform inspired by LinkedIn, built using the MERN stack. It enables users to create professional profiles, connect with other users, share posts, and discover professionals through a modern and responsive interface.
 
-## Features
+## 🌐 Live Demo
 
-* User Registration
-* User Login Authentication
-* Password Hashing using bcrypt
+**Frontend (Vercel):**
+https://connexa-woad.vercel.app/
+
+**Backend API (Render):**
+https://your-render-backend-url.onrender.com
+
+---
+
+## ✨ Features
+
+* Secure User Registration & Login
 * Token-based Authentication
-* User Profile Management
+* Password Hashing using bcrypt
+* Professional User Profiles
 * Profile Picture Upload using Multer
-* Update User Information
-* Update Profile Information
-* Get User and Profile Details
-* Get All User Profiles
-* MongoDB Database Integration
+* Update User & Profile Information
+* Discover Professionals
+* View Dynamic User Profiles
+* Send & Manage Connection Requests
+* Accept Connection Requests
+* Create Posts with Image Upload
+* Personalized Activity Feed
 * RESTful API Architecture
+* MongoDB Database Integration
+* Responsive User Interface
 
-## Tech Stack
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+
+* Next.js
+* React.js
+* Redux Toolkit
+* CSS Modules
+* Axios
+
+### Backend
 
 * Node.js
 * Express.js
+
+### Database
+
 * MongoDB
 * Mongoose
-* bcrypt
+
+### Other Tools
+
+* Git
+* GitHub
 * Multer
+* bcrypt
 * dotenv
 * CORS
 
-## Installation
+---
+
+## 📦 Installation
 
 ### Clone Repository
 
 ```bash
 git clone <repository-url>
-cd backend
+cd Connexa
 ```
 
 ### Install Dependencies
 
+#### Backend
+
 ```bash
+cd backend
 npm install
 ```
 
-### Create Environment Variables
+#### Frontend
 
-Create a `.env` file:
+```bash
+cd frontend
+npm install
+```
+
+---
+
+## ⚙️ Environment Variables
+
+Create a `.env` file inside the backend directory.
 
 ```env
 MONGO_URL=your_mongodb_connection_string
+PORT=9090
 ```
 
-### Run Development Server
+---
+
+## ▶️ Run the Application
+
+### Backend
 
 ```bash
+cd backend
 npm run dev
 ```
 
-Server runs on:
+### Frontend
 
-```txt
-http://localhost:9090
+```bash
+cd frontend
+npm run dev
 ```
 
-## API Endpoints
+Open:
 
-| Method | Endpoint              |
-| ------ | --------------------- |
-| POST   | /register             |
-| POST   | /login                |
-| POST   | /upload_profile       |
-| POST   | /user_update          |
-| POST   | /updateProfileData    |
-| POST   | /get_user_and_profile |
-| POST   | /getAllUserProfile    |
+```text
+http://localhost:3000
+```
 
-## Project Structure
+---
 
-```txt
-backend/
+## 📁 Project Structure
+
+```text
+Connexa/
 │
-├── controllers/
-├── models/
-├── routes/
-├── uploads/
-├── .env
-├── server.js
-├── package.json
+├── frontend/
+│   ├── app/
+│   ├── public/
+│   ├── components/
+│   └── ...
+│
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── uploads/
+│   └── ...
+│
 └── README.md
 ```
 
-## Future Improvements
+---
 
-* JWT Authentication
-* Posts and Feed System
-* Comments and Likes
-* Connection Requests
-* Real-time Messaging
-* Cloud Image Storage
-* Role-Based Authorization
+## 🚀 Future Enhancements
 
+* Comments & Replies
+* Likes & Reactions
+* Notifications
+* Real-time Chat
+* Search & Filters
+* Cloud Image Storage (Cloudinary)
+* JWT Refresh Tokens
+* Email Verification
+* Profile Analytics
+* Dark Mode
 
+---
 
-Built as a learning project to explore full-stack web development using Node.js, Express.js, MongoDB, and modern backend architecture.
+## 👨‍💻 Author
+
+**Yadnesh Vidulkar**
+
+If you found this project helpful, consider giving it a ⭐ on GitHub!
