@@ -25,6 +25,9 @@ export default function ViewProfilePage() {
 
   
 
+
+  
+
   // fetch the profile on the client instead of awaiting it in the component body
   useEffect(() => {
     const fetchProfile = async () => {
