@@ -23,15 +23,6 @@ export default function ViewProfilePage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [photoPreviewUrl, setPhotoPreviewUrl] = useState("");
 
-  
-
-
-
-
-
-
-  
-
   // fetch the profile on the client instead of awaiting it in the component body
   useEffect(() => {
     const fetchProfile = async () => {
