@@ -34,6 +34,7 @@ export default function ViewProfilePage() {
           { params: { username } }
         );
 
+        
         if (!request.data.profile) {
           setProfileError("Profile not found");
           return;
