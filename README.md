@@ -12,7 +12,6 @@ https://connexa-woad.vercel.app/
 ---
 ## ✨ Features
 
-
 * Secure User Registration & Login
 * Token-based Authentication
 * Password Hashing using bcrypt
