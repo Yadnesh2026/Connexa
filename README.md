@@ -11,7 +11,6 @@ https://connexa-woad.vercel.app/
 [https://connexa-backend-4yg5.onrender.com](https://connexa-backend-4yg5.onrender.com)
 ---
 ## ✨ Features
-
 * Secure User Registration & Login
 * Token-based Authentication
 * Password Hashing using bcrypt
