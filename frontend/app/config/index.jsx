@@ -46,6 +46,7 @@ export const handleImageError = (event, fallback = "default.jpg") => {
 
 
 
+
 export const clientServer = axios.create({
     baseURL:baseURL,
 })
