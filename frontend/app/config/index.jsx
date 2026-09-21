@@ -33,6 +33,7 @@ export const getMediaUrl = (fileName, fallback = "default.jpg") => {
   return `${baseURL}/uploads/${cleanFile}`;
 };
 
+
 export const handleImageError = (event, fallback = "default.jpg") => {
   const fallbackUrl = getMediaUrl(fallback);
 
