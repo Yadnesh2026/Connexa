@@ -353,7 +353,6 @@ export default function ViewProfilePage() {
                     Add company, role, and duration to make this profile look complete and professional.
                   </p>
                   {isOwnProfile && (
-                    
                     <button
                       type="button"
                       className={styles.addWorkButton}
@@ -375,9 +374,6 @@ export default function ViewProfilePage() {
               )}
             </div>
           </div>
-
-
-
         </div>
       </DashBoardLayout>
     </UserLayout>
